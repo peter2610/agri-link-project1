@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import LogoWhite from "@/public/logo-white.svg";
+import LogoWhite from "../../public/logo-white.svg";
 
 export default function NavBar() {
     return (

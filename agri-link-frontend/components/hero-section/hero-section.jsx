@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
-import heroImage from "@/public/hero-image.jpg"
+import heroImage from "../../public/hero-image.jpg"
 
 export default function HeroSection() {
     return (
