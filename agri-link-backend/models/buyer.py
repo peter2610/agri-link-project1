@@ -3,8 +3,8 @@ from sqlalchemy_serializer import SerializerMixin # type: ignore[import]
 
 from config import db, bcrypt
 
-class User(db.Model, SerializerMixin):
-	__tablename__ = 'users'
+class Buyer(db.Model, SerializerMixin):
+	__tablename__ = 'buyers'
     
 	id = db.Column(db.Integer, primary_key=True)
 	full_name = db.Column(db.String, nullable=False)
