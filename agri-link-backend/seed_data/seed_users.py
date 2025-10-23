@@ -12,7 +12,7 @@ def seed_farmers(count=10):
     for n in range(count):
         full_name = fake.name()
         email = fake.unique.email()
-        phone_number = fake.msidn()[:10]
+        phone_number = fake.msisdn()[:10]
         location = random.choice(locations)
 
         farmer = Farmer(
