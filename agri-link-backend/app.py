@@ -8,7 +8,7 @@ from routes.signin_farmer_route import SigninFarmer
 from routes.signup_farmer_route import SignupFarmer
 
 
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})    
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://172.16.16.182:3000"]}}, supports_credentials=True,)    
 
 api.add_resource(Main, '/', endpoint='main')
 api.add_resource(Farmers, '/farmers', endpoint='farmers')
