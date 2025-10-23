@@ -1,10 +1,13 @@
-# agri-link-backend/app/models/order.py
+# agri-link-backend/models/order.py
 
-from app.extensions import db
+from config import db
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 
-class Order(db.Model):
+class Order(db.Model, SerializerMixin):
     __tablename__ = "orders"
+    
+    serialize_rules = ('-farmer.orders',)
 
     id = db.Column(db.Integer, primary_key=True)
     crop_name = db.Column(db.String(120), nullable=False)
