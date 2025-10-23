@@ -9,6 +9,7 @@ class Farmer(db.Model, SerializerMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	full_name = db.Column(db.String, nullable=False)
 	email = db.Column(db.String, unique=True, nullable=False)
+	phone_number = db.Column(db.String(10))
 	_password_hash = db.Column(db.String, nullable=False)
 	location = db.Column(db.String, nullable=False)
 
@@ -25,13 +26,14 @@ class Farmer(db.Model, SerializerMixin):
 
 	def authenticate(self, password):
 		return bcrypt.check_password_hash(
-			self._password_hash, password.encode('utf-8')
+			self._password_hash, password
 		)
 	
 	def to_dict(self):
 		return {
 			"id" : self.id,
-			"full name" : self.full_name,
+			"full_name" : self.full_name,
 			"email" : self.email,
+			"phone_number": self.phone_number,
 			"location" : self.location,
 		}
