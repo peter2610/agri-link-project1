@@ -6,7 +6,7 @@ from routes.dashboard_routes import DashboardResource, FarmerStatsResource
 from routes.order_routes import OrderListResource, OrderDetailResource, OrderStatisticsResource
 
 # Import models to ensure they are registered with SQLAlchemy
-from models import Farmer, Order, Dashboard
+from models import Farmer, Crop, Order, Collaboration, Dashboard
 
 CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})    
 
