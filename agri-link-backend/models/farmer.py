@@ -1,6 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin # type: ignore[import]
-
+from datetime import datetime
 from config import db, bcrypt
 
 class Farmer(db.Model, SerializerMixin):
@@ -12,6 +12,10 @@ class Farmer(db.Model, SerializerMixin):
 	phone_number = db.Column(db.String(10))
 	_password_hash = db.Column(db.String, nullable=False)
 	location = db.Column(db.String, nullable=False)
+	created_at = db.Column(db.DateTime, default=datetime.now)
+
+	crops = db.relationship('Crop', backref='farmer', lazy=True)
+	offers = db.relationship('Offer', backref='farmer', lazy=True)
 
 	@hybrid_property
 	def password_hash(self):
@@ -37,3 +41,4 @@ class Farmer(db.Model, SerializerMixin):
 			"phone_number": self.phone_number,
 			"location" : self.location,
 		}
+
