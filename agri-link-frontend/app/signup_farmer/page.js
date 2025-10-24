@@ -1,4 +1,4 @@
-import SignupFarmer from "../../components/signup/signup_farmer";
+import SignupFarmer from "../../components/user-authentication/signup_farmer";
 
 export default function SignupFarmerPage() {
     return (
