@@ -2,7 +2,7 @@
 
 from flask import jsonify, request
 from flask_restful import Resource
-from models import Dashboard, Farmer, Crop, Order, Collaboration
+from models import dashboard, Farmer, Crop, Order, Collaboration
 from config import db
 
 class DashboardResource(Resource):
