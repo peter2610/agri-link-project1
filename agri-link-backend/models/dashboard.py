@@ -1,51 +1,59 @@
-# agri-link-backend/models/dashboard.py
+from datetime import datetime
 
-from sqlalchemy_serializer import SerializerMixin
-from models.farmer import Farmer
-from models.crop import Crop
-from models.orders import Order
-from models.collaboration import Collaboration
+from sqlalchemy_serializer import SerializerMixin  # type: ignore[import]
 
-class Dashboard(SerializerMixin):
-    """
-    Dashboard helper class (not a DB table)
-    Computes aggregated data for a farmer's dashboard.
-    """
+from config import db
 
-    def __init__(self, farmer_id: int):
-        self.farmer_id = farmer_id
 
-    def get_summary(self):
-        farmer = Farmer.query.get(self.farmer_id)
-        if not farmer:
-            return {"error": "Farmer not found"}
+class Dashboard(db.Model, SerializerMixin):
+	__tablename__ = 'dashboards'
 
-        # --- Crops ---
-        crops = Crop.query.filter_by(farmer_id=self.farmer_id).all()
-        total_crops = len(crops)
-        total_quantity = sum(c.quantity for c in crops if c.quantity is not None)
+	id = db.Column(db.Integer, primary_key=True)
+	farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False, unique=True)
+	total_offers = db.Column(db.Integer, default=0)
+	total_crops = db.Column(db.Integer, default=0)
+	total_orders = db.Column(db.Integer, default=0)
+	pending_orders = db.Column(db.Integer, default=0)
+	completed_orders = db.Column(db.Integer, default=0)
+	total_revenue = db.Column(db.Float, default=0.0)
+	updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-        # --- Orders ---
-        orders = Order.query.filter_by(farmer_id=self.farmer_id).all()
-        completed_orders = [o for o in orders if o.status.lower() == "completed"]
-        pending_orders = len(orders) - len(completed_orders)
-        total_earnings = sum(o.compute_total for o in completed_orders)
+	farmer = db.relationship('Farmer', backref=db.backref('dashboard', uselist=False), lazy=True)
 
-        # --- Collaborations ---
-        collaborations = getattr(farmer, "collaborations", [])
-        total_collaborations = len(collaborations)
-        total_co2_saved = sum(getattr(c, "total_co2_saved", 0) for c in collaborations)
+	serialize_rules = ('-farmer.dashboard',)
 
-        return {
-            "farmer_id": farmer.id,
-            "farmer_name": farmer.name,
-            "location": farmer.location,
-            "total_crops": total_crops,
-            "total_quantity": total_quantity,
-            "total_orders": len(orders),
-            "completed_orders": len(completed_orders),
-            "pending_orders": pending_orders,
-            "total_earnings": round(total_earnings, 2),
-            "total_collaborations": total_collaborations,
-            "co2_saved": round(total_co2_saved, 2),
-        }
+	def refresh_metrics(self):
+		from sqlalchemy import func
+		from models.offer import Offer
+		from models.orders import Order
+
+		offer_query = Offer.query.filter_by(farmer_id=self.farmer_id)
+		self.total_offers = offer_query.count()
+		self.total_crops = offer_query.distinct(Offer.crop_id).count()
+
+		order_query = Order.query.filter_by(farmer_id=self.farmer_id)
+		self.total_orders = order_query.count()
+		self.pending_orders = order_query.filter(Order.status == 'pending').count()
+		self.completed_orders = order_query.filter(Order.status == 'completed').count()
+		self.total_revenue = order_query.with_entities(func.coalesce(func.sum(Order.total_price), 0.0)).scalar() or 0.0
+		self.updated_at = datetime.utcnow()
+		return self
+
+	def to_dict(self):
+		farmer = self.farmer
+		return {
+			"id": self.id,
+			"farmer_id": self.farmer_id,
+			"farmer": {
+				"id": farmer.id,
+				"full_name": farmer.full_name,
+				"location": farmer.location,
+			} if farmer else None,
+			"total_offers": self.total_offers,
+			"total_crops": self.total_crops,
+			"total_orders": self.total_orders,
+			"pending_orders": self.pending_orders,
+			"completed_orders": self.completed_orders,
+			"total_revenue": round(self.total_revenue or 0.0, 2),
+			"updated_at": self.updated_at.isoformat() if self.updated_at else None,
+		}

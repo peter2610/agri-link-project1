@@ -1,4 +1,4 @@
-# agri-link-backend/models/order.py
+# agri-link-backend/models/orders.py
 
 from config import db
 from datetime import datetime
@@ -6,44 +6,29 @@ from sqlalchemy_serializer import SerializerMixin
 
 class Order(db.Model, SerializerMixin):
     __tablename__ = "orders"
-    
-    serialize_rules = ('-farmer.orders',)
 
     id = db.Column(db.Integer, primary_key=True)
-    crop_name = db.Column(db.String(120), nullable=False)
+    buyer_id = db.Column(db.Integer, db.ForeignKey("buyers.id"), nullable=False)
+    offer_id = db.Column(db.Integer, db.ForeignKey("offers.id"), nullable=False)
     quantity = db.Column(db.Float, nullable=False)
-    price_per_kg = db.Column(db.Float, nullable=False)
-    total_price = db.Column(db.Float, nullable=True)  # optional, can compute if missing
-    location = db.Column(db.String(120))
-    status = db.Column(db.String(50), default="pending")  # pending / completed
-    farmer_id = db.Column(db.Integer, db.ForeignKey("farmers.id"), nullable=False)
+    total_price = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String, default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship backref is defined in Farmer model:
-    # farmer = db.relationship("Farmer", backref="orders")
+    buyer = db.relationship("Buyer", backref="orders", lazy=True)
+    offer = db.relationship("Offer", backref="orders", lazy=True)
 
-    def __repr__(self):
-        return f"<Order {self.id} - {self.crop_name} ({self.status})>"
+    serialize_rules = ("-buyer.orders", "-offer.orders")
 
-    # --- Helper Methods ---
-    @property
-    def compute_total(self):
-        """Compute total price if not stored explicitly."""
-        if self.total_price is not None:
-            return self.total_price
-        return self.quantity * self.price_per_kg
-
-    def mark_completed(self):
-        """Mark the order as completed."""
-        self.status = "completed"
-        db.session.commit()
-
-    @staticmethod
-    def get_all_orders(farmer_id=None, status=None):
-        """Fetch orders with optional filtering."""
-        query = Order.query
-        if farmer_id:
-            query = query.filter_by(farmer_id=farmer_id)
-        if status:
-            query = query.filter(Order.status.ilike(status))
-        return query.order_by(Order.created_at.desc()).all()
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "buyer_id": self.buyer_id,
+            "offer_id": self.offer_id,
+            "quantity": self.quantity,
+            "total_price": self.total_price,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
