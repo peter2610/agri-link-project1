@@ -12,10 +12,10 @@ export default function NavBar() {
             </div>
             <div className="bg-neutral-50/20 backdrop-blur-sm border-2 border-neutral-50/80 px-12 py-4 rounded-full">
                 <div className="flex gap-10 text-xl text-neutral-50 items-center">
-                    <Link href={"/"}>Home</Link>
-                    <Link href={"/marketplace"}><p>Marketplace</p></Link>
-                    <Link href={"/signin"}>
-                        <div className="bg-lime-300 px-5 py-1 inline-flex items-center gap-2 rounded-full">
+                    <Link href={"/"} className="hover:underline hover:underline-offset-8">Home</Link>
+                    <Link href={"/signin_buyer"} className="hover:underline hover:underline-offset-8"><p>Marketplace</p></Link>
+                    <Link href={"/signin_farmer"}>
+                        <div className="bg-lime-300 hover:bg-lime-200 px-5 py-1 inline-flex items-center gap-2 rounded-full">
                             <p className="text-green-800 font-bold">Login</p>
                         </div>
                     </Link>
