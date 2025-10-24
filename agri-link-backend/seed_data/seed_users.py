@@ -41,11 +41,13 @@ def seed_buyers(count=10):
     for n in range(count):
         full_name = fake.name()
         email = fake.unique.email()
+        phone_number = fake.msisdn()[:10]
         location = random.choice(locations)
 
         buyer = Buyer(
             full_name = full_name,
             email = email,
+            phone_number = phone_number,
             location = location,
         )
 
