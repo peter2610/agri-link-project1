@@ -1,8 +1,7 @@
 from datetime import datetime
-
 from sqlalchemy_serializer import SerializerMixin  # type: ignore[import]
-
 from config import db
+# from models.dashboard import Dashboard
 
 
 class Dashboard(db.Model, SerializerMixin):

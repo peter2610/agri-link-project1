@@ -1,3 +1,4 @@
+# app.py
 from flask_cors import CORS
 from config import app, api, db
 from routes.main_route import Main
@@ -20,10 +21,18 @@ from routes.order_route import OrderListResource, OrderDetailResource, OrderStat
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# ✅ Enable CORS for frontend connection
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://172.16.16.182:3000"
+        ]
+    }
+}, supports_credentials=True)
 
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://172.16.16.182:3000"]}}, supports_credentials=True,)    
-
-# Register routes
+# ✅ Register Routes
 api.add_resource(Main, '/', endpoint='main')
 api.add_resource(Farmers, '/farmers', endpoint='farmers')
 api.add_resource(Buyers, '/buyers', endpoint='buyers')
@@ -37,14 +46,15 @@ api.add_resource(CollaborationDetailResource, '/collaborations/<int:collaboratio
 api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/contributions', endpoint='contribution')
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
 
-# Dashboard routes
-api.add_resource(DashboardResource, '/api/dashboard', '/api/dashboard/<int:farmer_id>')
-api.add_resource(FarmerStatsResource, '/api/farmer/<int:farmer_id>/stats')
+# Dashboard
+api.add_resource(DashboardResource, '/dashboard', '/dashboard/<int:farmer_id>')
+api.add_resource(FarmerStatsResource, '/farmer/<int:farmer_id>/stats')
 
-# Order routes
-api.add_resource(OrderListResource, '/api/orders')
-api.add_resource(OrderDetailResource, '/api/orders/<int:order_id>')
-api.add_resource(OrderStatisticsResource, '/api/orders/statistics')
+# Orders
+api.add_resource(OrderListResource, '/orders')
+api.add_resource(OrderDetailResource, '/orders/<int:order_id>')
+api.add_resource(OrderStatisticsResource, '/orders/statistics')
 
+# ✅ Run Server
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5555, debug=True)

@@ -1,4 +1,4 @@
-# agri-link-backend/models/orders.py
+# agri-link-backend/models/order.py
 
 from datetime import datetime
 from sqlalchemy import Enum
@@ -9,7 +9,7 @@ from sqlalchemy_serializer import SerializerMixin
 STATUS_OPTIONS = ("pending", "completed", "cancelled")
 
 class Order(db.Model, SerializerMixin):
-    __tablename__ = "orders"
+    __tablename__ = "order"
 
     id = db.Column(db.Integer, primary_key=True)
     buyer_id = db.Column(db.Integer, db.ForeignKey("buyers.id"), nullable=False)

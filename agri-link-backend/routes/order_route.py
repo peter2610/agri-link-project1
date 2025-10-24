@@ -1,14 +1,17 @@
-# agri-link-backend/routes/order_routes.py
+# agri-link-backend/routes/order_route.py
 
 from flask import jsonify, request
 from flask_restful import Resource
-from models import Order, Farmer
+# from models import Order, Farmer
 from config import db
 from datetime import datetime
+from models.order import Order
+from models.farmer import Farmer
 
 class OrderListResource(Resource):
     def get(self):
         """Get all orders with optional filtering"""
+  
         try:
             # Get query parameters
             farmer_id = request.args.get('farmer_id', type=int)
