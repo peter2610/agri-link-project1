@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from flask import jsonify
 from config import db
-from models.offer import Offer, Crop  # ✅ fixed import (no "app.")
+from models.offer import Offer, Crop
 # No circular import anymore
 
 # ===============================
