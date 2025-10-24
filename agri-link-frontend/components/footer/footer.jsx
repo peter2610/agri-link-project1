@@ -14,7 +14,7 @@ export default function Footer() {
             <div>
                 <nav className="flex gap-10 text-xl text-neutral-50">
                     <Link href={"/"}><p>Home</p></Link>
-                    <Link href={"/marketplace"}><p>Marketplace</p></Link>
+                    <Link href={"/signin_buyer"}><p>Marketplace</p></Link>
                 </nav>
             </div>
             <div className="flex gap-4 items-center">
