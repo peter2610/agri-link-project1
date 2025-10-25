@@ -12,7 +12,8 @@ from routes.collaboration_route import (
     CollaborationListResource,
     CollaborationDetailResource,
     ContributionResource,
-    ContributionListResource
+    ContributionListResource,
+    CropContributorsResource,
 )
 
 import sys, os
@@ -32,6 +33,7 @@ api.add_resource(CollaborationListResource, '/collaborations', endpoint='collabo
 api.add_resource(CollaborationDetailResource, '/collaborations/<int:collaboration_id>', endpoint='collaboration_detail')
 api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/contributions', endpoint='contribution')
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
+api.add_resource(CropContributorsResource, '/collaborations/<int:collaboration_id>/crops/<int:crop_id>/contributors', endpoint='crop_contributors')
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5555, debug=True)
