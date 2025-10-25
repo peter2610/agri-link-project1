@@ -138,6 +138,22 @@ class ContributionResource(Resource):
             'message': f"Contribution added to crop {crop.crop_name} successfully",
             'crops': updated_crops
         })
+        
+# routes/collaboration_route.py
+class CropContributorsResource(Resource):
+    def get(self, collaboration_id, crop_id):
+        """
+        List all farmers who contributed to a specific crop in a collaboration
+        """
+        contributions = CollaborationParticipation.query.filter_by(
+            collaboration_id=collaboration_id,
+            crop_id=crop_id
+        ).all()
+
+        # Only include farmer names
+        result = [p.farmer_name for p in contributions]
+
+        return jsonify(result)
 
 
 class ContributionListResource(Resource):
