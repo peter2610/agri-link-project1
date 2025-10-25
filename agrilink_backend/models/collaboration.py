@@ -27,6 +27,7 @@ class CollaborationParticipation(db.Model):
     __tablename__ = 'collaboration_participations'
     id = db.Column(db.Integer, primary_key=True)
     collaboration_id = db.Column(db.Integer, db.ForeignKey('collaborations.id'), nullable=False)
+    crop_id = db.Column(db.Integer, db.ForeignKey('collaboration_crops.id'), nullable=False)
     farmer_name = db.Column(db.String(100), nullable=False)
     weight_contributed = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
