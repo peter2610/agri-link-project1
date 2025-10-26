@@ -4,7 +4,7 @@ import farmerCard2 from "../../public/farmer-selling.jpg"
 
 export default function OurVision() {
     return (
-        <div className="my-10 flex flex-col gap-10">
+        <div className="my-10 h-screen flex flex-col gap-10">
             <div className="text-green-800 flex justify-between w-full items-center">
                 <div className="w-sm">
                     <h1 className="text-8xl font-black leading-20">The Vision</h1>

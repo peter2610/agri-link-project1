@@ -2,7 +2,7 @@ export default function MiniNavbar() {
     const navlinks = ["About Us", "Our Mission", "Our Vision", "Testimonials"]
 
     return (
-        <div className="flex gap-10">
+        <div className="flex gap-10 mb-20">
             {navlinks.map((value, index) => {
                 return (
                     <ul key={index} className="items-center font-bold text-green-700">
