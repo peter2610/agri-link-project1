@@ -1,21 +1,6 @@
 from datetime import datetime
 from config import db
-from sqlalchemy import Enum
-
-CROP_CATEGORIES = ('Cereals', 'Vegetables', 'Fruits', 'Export Crop', 'Other')
-
-class Farmer(db.Model):  # temporary placeholder
-    __tablename__ = 'farmers'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-
-class Crop(db.Model):
-    __tablename__ = 'crops'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    category = db.Column(Enum(*CROP_CATEGORIES, name='crop_categories'), nullable=False)
-    farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
-    offers = db.relationship('Offer', backref='crop', lazy=True)
+# from models.crop import Crop
 
 class Offer(db.Model):
     __tablename__ = 'offers'
@@ -27,4 +12,6 @@ class Offer(db.Model):
     location = db.Column(db.String(150))
     post_harvest_period = db.Column(db.Integer, default=0)
     status = db.Column(db.String(20), default='pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    

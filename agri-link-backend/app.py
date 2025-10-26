@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from flask_cors import CORS
 from config import app, api
 from routes.main_route import Main
@@ -15,8 +17,6 @@ from routes.collaboration_route import (
     ContributionListResource
 )
 
-import sys, os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://172.16.16.182:3000"]}}, supports_credentials=True,)    
 
@@ -34,4 +34,4 @@ api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/c
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5555, debug=True)
+    app.run(port=5555, debug=True)
