@@ -24,7 +24,7 @@ class Dashboard(db.Model, SerializerMixin):
 	def refresh_metrics(self):
 		from sqlalchemy import func
 		from models.offer import Offer
-		from models.orders import Order
+		from models.order import Order
 
 		offer_query = Offer.query.filter_by(farmer_id=self.farmer_id)
 		self.total_offers = offer_query.count()
