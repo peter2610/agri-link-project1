@@ -3,18 +3,21 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 
-export default function ContributionForm({ orderId, onSubmit }) {
+export default function ContributionForm({ orderId, crops = [], onSubmit }) {
   const [weight, setWeight] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const cropId = crops[0]?.id;
+    const farmerName = "User";
+    if (!cropId) return toast.error("No crop available to contribute to");
     if (!weight || weight <= 0) return toast.error("Enter a valid weight greater than 0");
-    onSubmit(weight);
+    onSubmit({ farmerName, cropId, weight });
     setWeight("");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-2">
+    <form onSubmit={handleSubmit} className="mt-4">
       <label className="block mb-2 font-semibold text-green-900">Weight:</label>
       <div className="flex flex-col sm:flex-row gap-4">
         <input
