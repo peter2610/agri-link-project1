@@ -17,7 +17,7 @@ export default function ContributionForm({ orderId, crops = [], onSubmit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
+    <form onSubmit={handleSubmit} className="mt-0 bg-[#F4F7F4]">
       <label className="block mb-2 font-semibold text-green-900">Weight:</label>
       <div className="flex flex-col sm:flex-row gap-4">
         <input
