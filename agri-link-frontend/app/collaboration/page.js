@@ -66,7 +66,7 @@ export default function CollaborationHub() {
         </div>
         <a href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
           <ArrowLeft size={18} />
-          <span>Back To Home</span>
+          <span>logout</span>
         </a>
       </aside>
 
@@ -84,14 +84,14 @@ export default function CollaborationHub() {
           </div>
         </div>
 
-        <div className="bg-[#F4F7F4] rounded-3xl p-4 md:p-6">
+        <div className="bg-[#F4F7F4] rounded-3xl p-6">
           <div className="flex items-center gap-3 px-2 md:px-4">
             <button className="text-green-800 font-semibold">Active</button>
             <span className="text-gray-400">|</span>
             <button className="text-green-800">Add Collaboration</button>
           </div>
 
-          <div className="mt-3 overflow-x-auto bg-white rounded-2xl">
+          <div className="mt-3 overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
                 <tr className="text-green-900 text-sm">
