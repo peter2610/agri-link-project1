@@ -18,11 +18,13 @@ export default function CollaborationDetails() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
 
   useEffect(() => {
     async function fetchOrder() {
       try {
-        const res = await fetch(`/api/orders/${id}`);
+        const res = await fetch(`${baseUrl}/collaborations/${id}`);
+        if (!res.ok) throw new Error(`Failed to fetch collaboration (${res.status})`);
         const data = await res.json();
         setOrder(data);
       } catch (err) {
@@ -32,15 +34,18 @@ export default function CollaborationDetails() {
     fetchOrder();
   }, [id]);
 
-  const handleSubmit = async (weight) => {
+  const handleSubmit = async ({ farmerName, cropId, weight }) => {
     if (!weight || weight <= 0) return alert("Enter a valid weight");
     try {
-      await fetch(`/api/collaborations`, {
+      const res = await fetch(`${baseUrl}/collaborations/${id}/contributions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: id, weight }),
+        body: JSON.stringify({ farmer_name: farmerName, crop_id: Number(cropId), weight: Number(weight) }),
       });
-      router.push("/collaboration");
+      if (!res.ok) throw new Error(`Failed to contribute (${res.status})`);
+      const updated = await res.json();
+      // Refresh details with updated crops
+      setOrder((prev) => prev ? { ...prev, crops: updated.crops ?? prev.crops } : prev);
     } catch (err) {
       console.error("Error adding collaboration:", err);
     }
@@ -101,61 +106,65 @@ export default function CollaborationDetails() {
           </div>
         </div>
 
-        <div className="bg-[#F4F7F4] rounded-3xl p-4 md:p-6">
+        <div className="bg-[#F4F7F4] rounded-[24px] p-6 md:p-8">
           <div className="flex items-center gap-3 px-2 md:px-4">
-            <button className="text-green-800 font-semibold">Active</button>
+            <span className="text-green-800 font-semibold">Active</span>
             <span className="text-gray-400">|</span>
-            <button className="text-green-800">Add Collaboration</button>
+            <span className="text-green-800">Add Collaboration</span>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 mt-3">
-            <h2 className="text-2xl font-extrabold text-green-700 mb-4">Order Details:</h2>
+          <div className="bg-white rounded-2xl p-6 mt-4">
+            <h2 className="text-[28px] font-extrabold text-green-700 mb-4">Order Details:</h2>
 
             {(() => {
               const formattedId = `ORD - ${String(order.id).padStart(3, "0")}`;
               const crop = order.crops?.[0];
               return (
-                <div className="grid sm:grid-cols-2 gap-y-4 gap-x-10 text-green-900 mb-6">
-                  <div>
-                    <div className="font-semibold">Order ID:</div>
-                    <div className="">{formattedId}</div>
+                <>
+                  <div className="grid sm:grid-cols-2 gap-y-4 gap-x-10 text-green-900 mb-6">
+                    <div>
+                      <div className="font-semibold">Order ID:</div>
+                      <div>{formattedId}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Location:</div>
+                      <div>{order.location}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold">Location:</div>
-                    <div className="">{order.location}</div>
+                  <div className="grid md:grid-cols-4 gap-y-6 gap-x-10 text-green-900 mb-6">
+                    <div>
+                      <div className="font-semibold">Crop Name:</div>
+                      <div>{crop?.crop_name ?? "-"}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Price (KSH / KG):</div>
+                      <div>{crop?.price ?? "-"}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Weight Demand:</div>
+                      <div>{crop?.weight_demand ?? 0}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Contributed Weight:</div>
+                      <div>{crop?.contributed_weight ?? 0}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold">Crop Name:</div>
-                    <div className="">{order.crop}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Price (KSH / KG):</div>
-                    <div className="">{crop?.price ?? order.price}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Weight Demand:</div>
-                    <div className="">{crop?.demand ?? order.quantity}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Contributed Weight:</div>
-                    <div className="">{crop?.contributedWeight ?? 0}</div>
-                  </div>
-                </div>
+                </>
               );
             })()}
 
-            {order.collaborators && order.collaborators.length > 0 && (
+            {Array.isArray(order.participations) && order.participations.length > 0 && (
               <div className="mb-6">
                 <div className="font-semibold text-green-900 mb-2">Contributing Farmers:</div>
                 <ul className="text-green-900 space-y-1 list-none">
-                  {order.collaborators.map((name, i) => (
-                    <li key={i}>{name}</li>
+                  {order.participations.map((p, i) => (
+                    <li key={i}>{p.farmer_name}</li>
                   ))}
                 </ul>
               </div>
             )}
 
-            <ContributionForm orderId={id} onSubmit={handleSubmit} />
+            <ContributionForm orderId={id} crops={order.crops ?? []} onSubmit={handleSubmit} />
           </div>
         </div>
       </main>
