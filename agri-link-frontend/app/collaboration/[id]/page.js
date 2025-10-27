@@ -113,7 +113,7 @@ export default function CollaborationDetails() {
             <span className="text-green-800">Add Collaboration</span>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 mt-4">
+          <div className="bg-[#F4F7F4] rounded-2xl p-6 mt-4">
             <h2 className="text-[28px] font-extrabold text-green-700 mb-4">Order Details:</h2>
 
             {(() => {
@@ -164,6 +164,8 @@ export default function CollaborationDetails() {
               </div>
             )}
 
+          </div>
+          <div className="mt-4 -mx-6 md:-mx-8 bg-[#F4F7F4] rounded-2xl p-0">
             <ContributionForm orderId={id} crops={order.crops ?? []} onSubmit={handleSubmit} />
           </div>
         </div>
