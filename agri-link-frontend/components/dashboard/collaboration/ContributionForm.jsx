@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function ContributionForm({ orderId, onSubmit }) {
   const [weight, setWeight] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!weight || weight <= 0) return alert("Enter a valid weight");
+    if (!weight || weight <= 0) return toast.error("Enter a valid weight greater than 0");
     onSubmit(weight);
     setWeight("");
   };
@@ -21,9 +22,10 @@ export default function ContributionForm({ orderId, onSubmit }) {
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           className="flex-1 min-w-0 rounded-2xl border-2 border-green-800 px-5 py-4 text-green-900 placeholder:text-green-700/70"
-          min={0}
+          min={0.01}
           step="0.01"
           placeholder="0.00 KG"
+          required
         />
         <button
           type="submit"
