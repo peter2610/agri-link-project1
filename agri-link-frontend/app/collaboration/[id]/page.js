@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import CropRow from "../../../components/dashboard/collaboration/CropRow";
 import ContributionForm from "../../../components/dashboard/collaboration/ContributionForm";
+import Sidebar from "../../../components/dashboard/side-navbar/side-navbar";
 import {
   Home,
   ClipboardList,
@@ -60,37 +61,7 @@ export default function CollaborationDetails() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <aside className="w-[280px] bg-[#F4F7F4] p-8 flex flex-col justify-between">
-        <div>
-          <div className="text-2xl font-extrabold text-green-700 mb-8">AgriLink</div>
-          <nav className="space-y-2">
-            <a href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
-              <Home size={18} />
-              <span>Home</span>
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
-              <ClipboardList size={18} />
-              <span>View Orders</span>
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
-              <PlusCircle size={18} />
-              <span>Make An Offer</span>
-            </a>
-            <a href="/collaboration" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#CFF56A] text-green-900">
-              <UsersRound size={18} />
-              <span>Collaborations</span>
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
-              <MessageSquareText size={18} />
-              <span>AI Assistant</span>
-            </a>
-          </nav>
-        </div>
-        <a href="/collaboration" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
-          <ArrowLeft size={18} />
-          <span>Back To Home</span>
-        </a>
-      </aside>
+      <Sidebar />
 
       <main className="flex-1 flex flex-col px-10 py-8">
         <div className="flex items-start justify-between mb-6">
