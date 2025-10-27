@@ -198,11 +198,7 @@ export default function OfferForm() {
             </div>
           </div>
       </form>
-      <div className="mt-4">
-        <button type="button" onClick={testFetchOffers} className="rounded-2xl border-2 border-green-800 text-green-800 font-semibold px-6 py-3 hover:bg-green-50">
-          created Offers
-        </button>
-      </div>
+      
     </div>
   );
 }
