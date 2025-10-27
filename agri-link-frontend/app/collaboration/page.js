@@ -16,14 +16,30 @@ import {
 export default function CollaborationHub() {
   const [orders, setOrders] = useState([]);
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
 
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const res = await fetch("/api/orders");
+        const res = await fetch(`${baseUrl}/collaborations`);
+        if (!res.ok) throw new Error(`Failed to fetch collaborations (${res.status})`);
         const data = await res.json();
-        const activeOrders = data.filter((order) => order.status === "Active");
-        setOrders(activeOrders);
+        // Map backend collaborations to UI rows
+        const mapped = (Array.isArray(data) ? data : []).map((c) => {
+          const first = (c.crops && c.crops[0]) || null;
+          const weightDemand = first?.weight_demand ?? 0;
+          const contributed = first?.contributed_weight ?? 0;
+          const progress = weightDemand > 0 ? Math.round((contributed / weightDemand) * 100) : 0;
+          return {
+            id: c.id,
+            crop: first?.crop_name || "-",
+            price: first?.price ?? "-",
+            location: c.location,
+            quantity: weightDemand,
+            progress,
+          };
+        });
+        setOrders(mapped);
       } catch (err) {
         console.error("Error fetching orders:", err);
       }
