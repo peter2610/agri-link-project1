@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function OfferForm() {
   const [form, setForm] = useState({
@@ -12,15 +13,66 @@ export default function OfferForm() {
     location: "",
     postHarvest: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Offer submitted:", form);
+    const action = e?.nativeEvent?.submitter?.dataset?.action || "create";
+    console.log("Offer submitted:", form, "action:", action);
+
+    // Runtime validation
+    const cropName = form.cropName.trim();
+    const category = form.category.trim();
+    const price = Number(form.price);
+    const weight = Number(form.weight);
+    const location = form.location.trim();
+    const postHarvest = Number(form.postHarvest);
+
+    if (!cropName) return toast.error("Please enter the crop name");
+    if (!category) return toast.error("Please select a crop category");
+    if (!Number.isFinite(price) || price <= 0) return toast.error("Please enter a valid price greater than 0");
+    if (!Number.isFinite(weight) || weight <= 0) return toast.error("Please enter a valid weight greater than 0");
+    if (!location) return toast.error("Please add a location");
+    if (!Number.isFinite(postHarvest) || postHarvest < 0) return toast.error("Please enter a valid post harvest period");
+
+    if (loading) return;
+    try {
+      setLoading(true);
+      const res = await fetch("/api/offers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cropName,
+          category,
+          price,
+          weight,
+          location,
+          postHarvest,
+        }),
+      });
+
+      if (!res.ok) {
+        const errMsg = (await res.json().catch(() => null))?.message || "Failed to create offer";
+        return toast.error(errMsg);
+      }
+
+      const data = await res.json();
+      toast.success(data?.message || "Offer created successfully");
+
+      if (action === "create-new") {
+        setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error creating offer");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputBase =
@@ -29,14 +81,15 @@ export default function OfferForm() {
   const label = "block mb-2 font-semibold text-green-900";
 
   return (
-    <div className="bg-[#F4F7F4] rounded-3xl p-4 md:p-6">
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6">
+    <form id="offer-form" onSubmit={handleSubmit} className="bg-[#F4F7F4] rounded-3xl p-6" aria-busy={loading}>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className={label}>Crop Name:</label>
             <input
               className={inputBase}
               name="cropName"
+              type="text"
+              required
               value={form.cropName}
               onChange={handleChange}
               placeholder="Insert Name"
@@ -48,6 +101,7 @@ export default function OfferForm() {
               <select
                 className={`${inputBase} appearance-none pr-10`}
                 name="category"
+                required
                 value={form.category}
                 onChange={handleChange}
               >
@@ -64,6 +118,11 @@ export default function OfferForm() {
             <input
               className={inputBase}
               name="price"
+              type="number"
+              inputMode="decimal"
+              min="0.01"
+              step="0.01"
+              required
               value={form.price}
               onChange={handleChange}
               placeholder="KSH 0.00"
@@ -74,6 +133,11 @@ export default function OfferForm() {
             <input
               className={inputBase}
               name="weight"
+              type="number"
+              inputMode="decimal"
+              min="0.01"
+              step="0.01"
+              required
               value={form.weight}
               onChange={handleChange}
               placeholder="0.00 KG"
@@ -84,6 +148,8 @@ export default function OfferForm() {
             <input
               className={inputBase}
               name="location"
+              type="text"
+              required
               value={form.location}
               onChange={handleChange}
               placeholder="Add Location"
@@ -94,28 +160,17 @@ export default function OfferForm() {
             <input
               className={inputBase}
               name="postHarvest"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              required
               value={form.postHarvest}
               onChange={handleChange}
               placeholder="0 Months"
             />
           </div>
         </div>
-
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <button
-            type="submit"
-            className="sm:flex-1 rounded-2xl bg-[#CFF56A] text-green-900 font-semibold px-6 py-4 hover:brightness-95"
-          >
-            Add Offer
-          </button>
-          <button
-            type="button"
-            className="sm:flex-1 rounded-2xl border-2 border-green-800 text-green-800 font-semibold px-6 py-4 hover:bg-green-50"
-          >
-            Add & Create New Offer
-          </button>
-        </div>
-      </form>
-    </div>
+    </form>
   );
 }
