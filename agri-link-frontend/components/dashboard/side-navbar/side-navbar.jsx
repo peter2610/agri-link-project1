@@ -32,7 +32,10 @@ export default function SideNavBar() {
         >
           <BiPlusCircle /> Make An Offer
         </Link>
-        <Link href="/collaboration" className={`${itemBase} ${pathname?.startsWith("/collaboration") ? "bg-green-50" : ""}`}>
+        <Link
+          href="/collaboration"
+          className={`${itemBase} ${pathname?.startsWith("/collaboration") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}
+        >
           <BiGroup /> Collaborations
         </Link>
         <Link href="/assistant" className={itemBase}>

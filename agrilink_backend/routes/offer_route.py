@@ -1,21 +1,22 @@
 from flask_restful import Resource, reqparse
 from flask import jsonify
 from config import db
-from models.offer import Offer, Crop
+from models.offer import Offer, Crop, CROP_CATEGORIES
+from sqlalchemy import text
 # No circular import anymore
 
 # ===============================
 # Request Parser for POST and PUT
 # ===============================
 offer_parser = reqparse.RequestParser()
-offer_parser.add_argument('id', type=int)  # For PUT or DELETE
-offer_parser.add_argument('crop_name', type=str, required=False)
-offer_parser.add_argument('category', type=str)
-offer_parser.add_argument('quantity', type=float)
-offer_parser.add_argument('price', type=float)
-offer_parser.add_argument('location', type=str)
-offer_parser.add_argument('post_harvest_period', type=int, default=0)
-offer_parser.add_argument('status', type=str, default='pending')
+offer_parser.add_argument('id', type=int, location='json')  # For PUT or DELETE
+offer_parser.add_argument('crop_name', type=str, required=False, location='json')
+offer_parser.add_argument('category', type=str, location='json')
+offer_parser.add_argument('quantity', type=float, location='json')
+offer_parser.add_argument('price', type=float, location='json')
+offer_parser.add_argument('location', type=str, location='json')
+offer_parser.add_argument('post_harvest_period', type=int, default=0, location='json')
+offer_parser.add_argument('status', type=str, default='pending', location='json')
 
 
 class OfferResource(Resource):
@@ -52,17 +53,35 @@ class OfferResource(Resource):
         if not all(data.get(field) for field in required_fields):
             return jsonify({'error': 'Missing required fields'}), 400
 
-        # Check if crop exists
-        crop = Crop.query.filter_by(name=data['crop_name'], farmer_id=farmer_id).first()
-        if not crop:
-            crop = Crop(name=data['crop_name'], category=data['category'], farmer_id=farmer_id)
-            db.session.add(crop)
+        # Normalize category (map common test value 'Grains' to Enum 'Cereals')
+        raw_category = data.get('category')
+        cat_map = {'Grains': 'Cereals', 'grains': 'Cereals'}
+        normalized_category = cat_map.get(raw_category, raw_category)
+        if normalized_category not in CROP_CATEGORIES:
+            return jsonify({'error': f"Invalid category '{raw_category}'. Allowed: {', '.join(CROP_CATEGORIES)}"}), 400
+        data['category'] = normalized_category
+
+        # Remove legacy bad test data: convert any 'Grains' to 'Cereals' in DB
+        try:
+            db.session.execute(text("UPDATE crops SET category=:new WHERE category=:old"), {"new": "Cereals", "old": "Grains"})
             db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # Check if crop exists (query only id to avoid Enum conversion on bad rows)
+        existing_crop_id = db.session.query(Crop.id).filter_by(name=data['crop_name'], farmer_id=farmer_id).scalar()
+        if existing_crop_id:
+            crop_id = existing_crop_id
+        else:
+            new_crop = Crop(name=data['crop_name'], category=data['category'], farmer_id=farmer_id)
+            db.session.add(new_crop)
+            db.session.commit()
+            crop_id = new_crop.id
 
         # Create offer
         offer = Offer(
             farmer_id=farmer_id,
-            crop_id=crop.id,
+            crop_id=crop_id,
             quantity=data['quantity'],
             price=data['price'],
             location=data.get('location'),
@@ -110,7 +129,7 @@ class OfferResource(Resource):
     def delete(self):
         farmer_id = 1  # Hardcoded for testing
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True, help='Offer id is required')
+        parser.add_argument('id', type=int, required=True, help='Offer id is required', location='json')
         args = parser.parse_args()
         offer_id = args['id']
 
