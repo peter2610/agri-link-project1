@@ -81,7 +81,7 @@ export default function CollaborationDetails() {
             </a>
           </nav>
         </div>
-        <a href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
+        <a href="/collaboration" className="flex items-center gap-3 px-4 py-3 rounded-xl text-green-800 hover:bg-green-50">
           <ArrowLeft size={18} />
           <span>Back To Home</span>
         </a>
@@ -156,13 +156,6 @@ export default function CollaborationDetails() {
             )}
 
             <ContributionForm orderId={id} onSubmit={handleSubmit} />
-
-            <button
-              onClick={() => router.push("/collaboration")}
-              className="mt-6 px-4 py-2 rounded-xl border-2 border-green-800 text-green-800 hover:bg-green-50"
-            >
-              ← Back to Hub
-            </button>
           </div>
         </div>
       </main>
