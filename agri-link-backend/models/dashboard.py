@@ -38,6 +38,38 @@ class Dashboard(db.Model, SerializerMixin):
 		self.updated_at = datetime.utcnow()
 		return self
 
+	def get_summary(self):
+		from sqlalchemy import func
+		from models.order import Order
+
+		self.refresh_metrics()
+		db.session.add(self)
+		db.session.commit()
+
+		orders_query = Order.query.filter(Order.farmer_id == self.farmer_id)
+		orders = orders_query.all()
+
+		total_quantity = orders_query.with_entities(func.coalesce(func.sum(Order.quantity), 0.0)).scalar() or 0.0
+
+		total_revenue = sum(order.compute_total for order in orders if order.status == 'completed')
+		pending_revenue = sum(order.compute_total for order in orders if order.status == 'pending')
+		average_price = (
+			sum((order.price_per_kg or 0) for order in orders if order.price_per_kg)
+			/ max(len([order for order in orders if order.price_per_kg]), 1)
+		)
+
+		summary = self.to_dict()
+		summary.update(
+			{
+				'total_quantity': float(total_quantity) if total_quantity is not None else 0.0,
+				'total_revenue_value': round(total_revenue, 2),
+				'pending_revenue_value': round(pending_revenue, 2),
+				'average_price_per_kg': round(average_price, 2) if orders else 0.0,
+			}
+		)
+
+		return summary
+
 	def to_dict(self):
 		farmer = self.farmer
 		return {

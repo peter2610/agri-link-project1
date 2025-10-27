@@ -1,11 +1,11 @@
 # agri-link-backend/routes/order_route.py
 
-from flask import jsonify, request
+from flask import request
 from flask_restful import Resource
-# from models import Order, Farmer
 from config import db
-from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
 from models.order import Order
+from models.offer import Offer
 from models.farmer import Farmer
 
 class OrderListResource(Resource):
@@ -25,16 +25,20 @@ class OrderListResource(Resource):
             query = Order.query
             
             if farmer_id:
-                query = query.filter_by(farmer_id=farmer_id)
+                query = query.filter(Order.farmer_id == farmer_id)
             
             if status:
                 query = query.filter_by(status=status)
             
             # Apply sorting
+            sort_attr = getattr(Order, sort_by, None)
+            if sort_attr is None:
+                sort_attr = Order.created_at
+
             if order == 'asc':
-                query = query.order_by(getattr(Order, sort_by).asc())
+                query = query.order_by(sort_attr.asc())
             else:
-                query = query.order_by(getattr(Order, sort_by).desc())
+                query = query.order_by(sort_attr.desc())
             
             # Paginate results
             paginated = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -43,11 +47,28 @@ class OrderListResource(Resource):
             orders = []
             for order_item in paginated.items:
                 order_dict = order_item.to_dict()
-                # Add farmer info
-                farmer = Farmer.query.get(order_item.farmer_id)
+
+                farmer = None
+                if order_dict.get('farmer_id'):
+                    farmer = Farmer.query.get(order_dict['farmer_id'])
+
                 if farmer:
-                    order_dict['farmer_name'] = farmer.name
-                    order_dict['farmer_location'] = farmer.location
+                    order_dict['farmer'] = {
+                        'id': farmer.id,
+                        'full_name': farmer.full_name,
+                        'location': farmer.location,
+                        'phone_number': farmer.phone_number,
+                    }
+
+                buyer = order_item.buyer
+                if buyer:
+                    order_dict['buyer'] = {
+                        'id': buyer.id,
+                        'full_name': buyer.full_name,
+                        'location': buyer.location,
+                        'phone_number': buyer.phone_number,
+                    }
+
                 orders.append(order_dict)
             
             return {
@@ -62,36 +83,47 @@ class OrderListResource(Resource):
                 }
             }, 200
             
+        except SQLAlchemyError as e:
+            return {"error": str(e)}, 500
         except Exception as e:
             return {"error": str(e)}, 500
     
     def post(self):
         """Create a new order"""
         try:
-            data = request.get_json()
-            
-            # Validate required fields
-            required_fields = ['crop_name', 'quantity', 'price_per_kg', 'farmer_id']
+            data = request.get_json() or {}
+
+            required_fields = ['buyer_id', 'offer_id', 'quantity']
             for field in required_fields:
                 if field not in data:
                     return {"error": f"Missing required field: {field}"}, 400
-            
-            # Create new order
+
+            offer = Offer.query.get(data['offer_id'])
+            if not offer:
+                return {"error": "Offer not found"}, 404
+
+            total_price = data.get('total_price')
+            if total_price is None:
+                # fall back to offer price * quantity when available
+                offer_price = offer.price or 0
+                total_price = float(data['quantity']) * float(offer_price)
+
             order = Order(
-                crop_name=data['crop_name'],
+                buyer_id=data['buyer_id'],
+                offer_id=data['offer_id'],
                 quantity=data['quantity'],
-                price_per_kg=data['price_per_kg'],
-                total_price=data.get('total_price', data['quantity'] * data['price_per_kg']),
-                location=data.get('location', ''),
+                total_price=total_price,
                 status=data.get('status', 'pending'),
-                farmer_id=data['farmer_id']
             )
-            
+
             db.session.add(order)
             db.session.commit()
-            
+
             return order.to_dict(), 201
-            
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"error": str(e)}, 500
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 500
@@ -106,13 +138,13 @@ class OrderDetailResource(Resource):
             
             order_dict = order.to_dict()
             # Add farmer info
-            farmer = Farmer.query.get(order.farmer_id)
+            farmer = Farmer.query.get(order.farmer_id) if order.farmer_id else None
             if farmer:
                 order_dict['farmer'] = {
                     'id': farmer.id,
-                    'name': farmer.name,
+                    'full_name': farmer.full_name,
                     'email': farmer.email,
-                    'phone': farmer.phone,
+                    'phone_number': farmer.phone_number,
                     'location': farmer.location
                 }
             
@@ -178,7 +210,7 @@ class OrderStatisticsResource(Resource):
             
             query = Order.query
             if farmer_id:
-                query = query.filter_by(farmer_id=farmer_id)
+                query = query.filter(Order.farmer_id == farmer_id)
             
             all_orders = query.all()
             
@@ -201,7 +233,7 @@ class OrderStatisticsResource(Resource):
                         'total_revenue': 0
                     }
                 crop_stats[order.crop_name]['count'] += 1
-                crop_stats[order.crop_name]['total_quantity'] += order.quantity
+                crop_stats[order.crop_name]['total_quantity'] += float(order.quantity or 0)
                 if order.status == 'completed':
                     crop_stats[order.crop_name]['total_revenue'] += order.compute_total
             
@@ -220,11 +252,13 @@ class OrderStatisticsResource(Resource):
                     {
                         'name': crop[0],
                         'orders': crop[1]['count'],
-                        'quantity': crop[1]['total_quantity'],
+                        'quantity': round(crop[1]['total_quantity'], 2),
                         'revenue': round(crop[1]['total_revenue'], 2)
                     } for crop in top_crops
                 ]
             }, 200
             
+        except SQLAlchemyError as e:
+            return {"error": str(e)}, 500
         except Exception as e:
             return {"error": str(e)}, 500

@@ -1,6 +1,7 @@
 # app.py
 from flask_cors import CORS
 from config import app, api, db
+from models import buyer, collaboration, dashboard, farmer, offer, order  # noqa: F401
 from routes.main_route import Main
 from routes.get_buyers_route import Buyers
 from routes.get_farmers_route import Farmers
@@ -31,6 +32,10 @@ CORS(app, resources={
         ]
     }
 }, supports_credentials=True)
+
+# ✅ Ensure tables exist (runs once on startup)
+with app.app_context():
+    db.create_all()
 
 # ✅ Register Routes
 api.add_resource(Main, '/', endpoint='main')
