@@ -6,7 +6,7 @@ import { ArrowLeftCircleIcon } from "lucide-react";
 
 export default function SideNavBar() {
     return (
-        <div className="h-screen inline-flex flex-col justify-between items-start px-15 py-20 bg-neutral-100 text-lg">
+        <div className="sticky top-0 h-screen w-64 flex-shrink-0 inline-flex flex-col justify-between items-start px-6 py-10 bg-neutral-100 text-lg">
             <div>
                 <Link href={"/"}>
                     <Image alt="logo" height={50} src={LogoBlack} />

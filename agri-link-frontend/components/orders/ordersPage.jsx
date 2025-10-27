@@ -24,14 +24,14 @@ const inactiveOrders = [
   { id: 4, crop: "Tea", quantityKg: "120", pricePerKg: "65", location: "Kericho" },
 ];
 
-const collaborateActions = [
-  { label: "Collaborate", color: "#820A04" },
-  { label: "Collaborate", color: "#B0A315" },
-  { label: "Collaborate", color: "#0C5B0D" },
-  { label: "Collaborate", color: "#0C5B0D" },
-  { label: "Collaborate", color: "#0C5B0D" },
-  { label: "Collaborate", color: "#0C5B0D" },
-  { label: "Collaborate", color: "#0C5B0D" },
+const collaborateColors = [
+  "#820A04",
+  "#B0A315",
+  "#0C5B0D",
+  "#0C5B0D",
+  "#0C5B0D",
+  "#0C5B0D",
+  "#0C5B0D",
 ];
 
 export default function OrdersPage() {
@@ -59,8 +59,7 @@ export default function OrdersPage() {
         </header>
 
         {/* Orders Section */}
-        <section className="mx-auto flex w-full max-w-[924px] flex-col md:flex-row gap-8 rounded-[20px] bg-[#F5F5F5] px-6 py-8 shadow-sm">
-          {/* Left: Orders Table */}
+        <section className="mx-auto w-full max-w-[924px] rounded-[20px] bg-[#F5F5F5] px-6 py-8 shadow-sm">
           <div className="flex-1">
             {/* Tabs */}
             <div className="mb-5 flex items-center gap-4 text-[20px] font-medium">
@@ -86,29 +85,43 @@ export default function OrdersPage() {
             {/* Table */}
             <div className="overflow-hidden rounded-[16px] bg-white shadow">
               {/* Table Header */}
-              <div className="grid grid-cols-[50px_repeat(4,minmax(0,1fr))] gap-3 border-b border-[#E4E4E4] px-5 py-3 text-[16px] font-semibold text-[#0C5B0D]">
+              <div className="grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 border-b border-[#E4E4E4] px-5 py-3 text-[16px] font-semibold text-[#0C5B0D]">
                 <span>#</span>
                 <span>Crop</span>
                 <span>Quantity (KG)</span>
                 <span>Price (KSH / KG)</span>
                 <span>Location</span>
+                <span className="text-right">Action</span>
               </div>
 
               {/* Table Rows */}
-              {orders.map(({ id, crop, quantityKg, pricePerKg, location }, index) => (
-                <div
-                  key={`${status}-${id}-${crop}`}
-                  className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))] gap-3 px-5 py-4 text-[15px] text-gray-700 ${
-                    index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
-                  }`}
-                >
-                  <span className="font-medium text-[#0C5B0D]">{id}</span>
-                  <span>{crop}</span>
-                  <span>{quantityKg}</span>
-                  <span>{pricePerKg}</span>
-                  <span>{location}</span>
-                </div>
-              ))}
+              {orders.map(({ id, crop, quantityKg, pricePerKg, location }, index) => {
+                const buttonColor = collaborateColors[index % collaborateColors.length];
+
+                return (
+                  <div
+                    key={`${status}-${id}-${crop}`}
+                    className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-[15px] text-gray-700 ${
+                      index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
+                    }`}
+                  >
+                    <span className="font-medium text-[#0C5B0D]">{id}</span>
+                    <span>{crop}</span>
+                    <span>{quantityKg}</span>
+                    <span>{pricePerKg}</span>
+                    <span>{location}</span>
+                    <span className="flex justify-end">
+                      <Link
+                        href="#"
+                        className="rounded-[9px] px-3 py-2 text-[15px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
+                        style={{ backgroundColor: buttonColor }}
+                      >
+                        Collaborate
+                      </Link>
+                    </span>
+                  </div>
+                );
+              })}
 
               {orders.length === 0 && (
                 <div className="px-5 py-8 text-center text-[15px] text-[#0C5B0D]/60">
@@ -117,20 +130,6 @@ export default function OrdersPage() {
               )}
             </div>
           </div>
-
-          {/* Right: Collaborate Buttons */}
-          <aside className="flex w-full md:w-[126px] flex-row md:flex-col justify-between md:justify-start gap-4">
-            {collaborateActions.map(({ label, color }, index) => (
-              <Link
-                key={`${label}-${index}`}
-                href="#"
-                className="rounded-[9px] px-3 py-2 text-center text-[16px] font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5"
-                style={{ backgroundColor: color }}
-              >
-                {label}
-              </Link>
-            ))}
-          </aside>
         </section>
       </main>
     </div>
