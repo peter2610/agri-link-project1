@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "lucide-react";
 
 export default function AboutUs() {
     return (
-        <div className="my-10 h-screen flex flex-col gap-10">
+        <div className="my-10 flex flex-col gap-10">
             <div className="text-green-800 flex justify-between w-full items-center">
                 <div className="w-sm mr-30">
                     <h1 className="text-8xl font-black leading-20">Who We Are</h1>
