@@ -66,7 +66,6 @@ export default function OfferForm() {
       const data = await res.json();
       toast.success(data?.message || "Offer created successfully");
 
-      // Always clear the form after a successful submission
       setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
     } catch (err) {
       console.error(err);
