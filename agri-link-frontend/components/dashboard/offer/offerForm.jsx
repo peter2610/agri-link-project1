@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function OfferForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     cropName: "",
     category: "",
@@ -66,8 +68,11 @@ export default function OfferForm() {
       const data = await res.json();
       toast.success(data?.message || "Offer created successfully");
 
-      if (action === "create-new") {
-        setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
+      setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
+
+      if (action === "create") {
+        toast.success("Redirecting to Orders…");
+        router.push("/orders");
       }
     } catch (err) {
       console.error(err);
