@@ -66,9 +66,8 @@ export default function OfferForm() {
       const data = await res.json();
       toast.success(data?.message || "Offer created successfully");
 
-      if (action === "create-new") {
-        setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
-      }
+      // Always clear the form after a successful submission
+      setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
     } catch (err) {
       console.error(err);
       toast.error("Network error creating offer");
