@@ -76,6 +76,8 @@ export default function OrdersPage() {
     };
   }, [status]);
 
+  
+
   return (
     <div className="flex-1 min-h-screen bg-[#FAFAFA] px-4 sm:px-8 lg:px-12 py-10 text-[#0C5B0D]">
       <main className="flex flex-col gap-10">
