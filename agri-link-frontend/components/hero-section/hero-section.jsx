@@ -11,7 +11,7 @@ export default function HeroSection() {
             <div className="absolute inset-0 flex flex-col justify-end z-10 p-30">
                 <h1 className="text-7xl font-black text-neutral-50 mb-10 w-3xl">Connecting Farmers<br /> Powering Sustainable Markets</h1>
                 <p className="text-neutral-50 font-medium text-2xl w-3xl mb-15">AgriLink helps smallholder farmers collaborate, share resources, and
-                    access larger buyers - reducing food waste and increasing profits through smart, data driven coordination.
+                    access larger markets & buyers - reducing food waste and increasing profits through smart, data driven coordination.
                 </p>
                 <Link href={"/signup_farmer"}>
                     <div className="bg-lime-300 pl-5 pr-1 py-1 inline-flex items-center gap-2 rounded-full">

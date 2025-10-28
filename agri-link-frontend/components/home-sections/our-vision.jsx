@@ -1,5 +1,5 @@
 import Image from "next/image";
-import farmerCard1 from "../../public/farmer-corn.jpg"
+import farmerCard1 from "../../public/vision-image.jpg"
 
 export default function OurVision() {
     return (
@@ -16,7 +16,7 @@ export default function OurVision() {
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-6 h-10">
-                <div><Image src={farmerCard1} height={100} alt="small-farmer" className="object-cover rounded-3xl w-full h-72" /></div>
+                <div><Image src={farmerCard1} height={300} alt="small-farmer" className="object-cover rounded-3xl w-full h-72" /></div>
                 <div className="p-10 flex mb-10 bg-lime-300 rounded-3xl items-center justify-center w-full h-72">
                     <p className="text-green-800 text-3xl">
                         Reduction in post-harvest loss through shared storage and logistics.
