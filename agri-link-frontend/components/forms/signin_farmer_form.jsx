@@ -3,6 +3,7 @@
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation";
+import { setStoredFarmer } from "@/lib/useCurrentFarmer";
 
 export default function SigninFarmerForm() {
     const router = useRouter()
@@ -24,6 +25,7 @@ export default function SigninFarmerForm() {
 
 
             if (response.ok) {
+                setStoredFarmer(data)
                 toast.success(`Welcome back, ${data.full_name.split(" ")[0]}!`)
                 router.push('/dashboard')
             } else {

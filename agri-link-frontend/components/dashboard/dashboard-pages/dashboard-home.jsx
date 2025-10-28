@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
+import useCurrentFarmer from "@/lib/useCurrentFarmer";
 
 const DEFAULT_FARMER_ID = 1;
 
@@ -24,6 +25,8 @@ export default function DashboardHome() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const currentFarmer = useCurrentFarmer();
+  const farmerId = currentFarmer?.id ?? DEFAULT_FARMER_ID;
 
   useEffect(() => {
     let ignore = false;
@@ -33,7 +36,8 @@ export default function DashboardHome() {
       setError(null);
 
       try {
-        const data = await fetchJson(`/dashboard?farmer_id=${DEFAULT_FARMER_ID}`);
+        const query = farmerId ? `?farmer_id=${farmerId}` : "";
+        const data = await fetchJson(`/dashboard${query}`);
         if (!ignore) {
           setDashboard(data);
         }
@@ -54,9 +58,9 @@ export default function DashboardHome() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [farmerId]);
 
-  const farmerName = dashboard?.farmer?.full_name ?? "User";
+  const farmerName = currentFarmer?.full_name ?? dashboard?.farmer?.full_name ?? "User";
   const summaryStats = [
     { title: "Orders Completed", value: formatNumber(dashboard?.completed_orders) },
     { title: "Pending Orders", value: formatNumber(dashboard?.pending_orders) },

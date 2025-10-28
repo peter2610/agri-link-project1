@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import CropRow from "../../../components/dashboard/collaboration/CropRow";
 import ContributionForm from "../../../components/dashboard/collaboration/ContributionForm";
 import Sidebar from "../../../components/dashboard/side-navbar/side-navbar";
+import useCurrentFarmer from "@/lib/useCurrentFarmer";
 import {
   Home,
   ClipboardList,
@@ -20,6 +21,8 @@ export default function CollaborationDetails() {
   const [order, setOrder] = useState(null);
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
+  const currentFarmer = useCurrentFarmer();
+  const displayName = currentFarmer?.full_name?.split(" ")[0] ?? "User";
 
   useEffect(() => {
     async function fetchOrder() {
@@ -70,7 +73,9 @@ export default function CollaborationDetails() {
             <p className="text-gray-600 -mt-1">Collaborate with other farmers on orders</p>
           </div>
           <div className="flex items-center gap-3 text-green-900">
-            <span>Welcome, <span className="font-semibold">User</span></span>
+            <span>
+              Welcome, <span className="font-semibold">{displayName}</span>
+            </span>
             <div className="h-9 w-9 rounded-full border-2 border-green-700 grid place-items-center">
               <UserRound size={18} />
             </div>
@@ -137,7 +142,12 @@ export default function CollaborationDetails() {
 
           </div>
           <div className="mt-4 -mx-6 md:-mx-8 bg-[#F4F7F4] rounded-2xl p-0">
-            <ContributionForm orderId={id} crops={order.crops ?? []} onSubmit={handleSubmit} />
+            <ContributionForm
+              orderId={id}
+              crops={order.crops ?? []}
+              onSubmit={handleSubmit}
+              defaultFarmerName={currentFarmer?.full_name}
+            />
           </div>
         </div>
       </main>

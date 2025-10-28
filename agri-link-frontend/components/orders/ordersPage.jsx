@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
+import useCurrentFarmer from "@/lib/useCurrentFarmer";
 
 const ACTIVE = "active";
 const INACTIVE = "inactive";
@@ -41,6 +42,8 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const currentFarmer = useCurrentFarmer();
+  const displayName = currentFarmer?.full_name?.split(" ")[0] ?? "User";
 
   useEffect(() => {
     let ignore = false;
@@ -92,7 +95,7 @@ export default function OrdersPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
               <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
             </div>
-            <p className="text-base font-medium text-gray-700">Welcome, User</p>
+            <p className="text-base font-medium text-gray-700">Welcome, {displayName}</p>
           </div>
         </header>
 

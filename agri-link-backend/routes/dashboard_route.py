@@ -1,6 +1,6 @@
 # agri-link-backend/routes/dashboard_route.py
 
-from flask import request
+from flask import request, session
 from flask_restful import Resource
 from sqlalchemy.exc import SQLAlchemyError
 from models.dashboard import Dashboard
@@ -14,7 +14,14 @@ class DashboardResource(Resource):
     def get(self, farmer_id=None):
         """Get dashboard summary for a farmer"""
         try:
-            farmer_id = farmer_id or request.args.get('farmer_id', type=int) or 1
+            farmer_id = (
+                farmer_id
+                or request.args.get('farmer_id', type=int)
+                or session.get('farmer_id')
+            )
+
+            if not farmer_id:
+                return {"error": "Farmer id not provided and no session found"}, 401
 
             farmer = Farmer.query.get(farmer_id)
             if not farmer:
