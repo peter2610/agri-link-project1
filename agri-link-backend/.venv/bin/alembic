@@ -1,8 +1,7 @@
-#!/home/arnoldm/dev/code/phase-5/agri-link-project/agri-link-backend/.venv/bin/python
-# -*- coding: utf-8 -*-
-import re
+#!/home/aci_peternm/development/code/Phase-5/agri-link-project/agri-link-backend/.venv/bin/python
 import sys
 from alembic.config import main
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    if sys.argv[0].endswith('.exe'):
+        sys.argv[0] = sys.argv[0][:-4]
     sys.exit(main())
