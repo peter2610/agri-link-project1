@@ -81,7 +81,7 @@ export default function DashboardHome() {
   return (
     <main className="flex min-h-screen flex-col gap-10 bg-[#FAFAFA] pb-16">
       {/* Header */}
-      <div className="mx-auto flex w-full max-w-[1024px] flex-col gap-6 pt-10 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <div>
           <p className="text-3xl font-semibold leading-tight text-[#0C5B0D]">
             Farmer’s Dashboard
@@ -99,7 +99,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick Summary Section */}
-      <section className="mx-auto w-full max-w-[1024px] rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Quick Summary
@@ -131,7 +131,7 @@ export default function DashboardHome() {
       </section>
 
       {/* Orders Overview Section */}
-      <section className="mx-auto w-full max-w-[1024px] rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Orders Overview
@@ -144,7 +144,7 @@ export default function DashboardHome() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-[16px] bg-white shadow">
+        <div className="overflow-hidden rounded-2xl bg-white shadow">
           <div className="overflow-x-auto">
             {/* Table Header */}
             <div className="grid min-w-[560px] grid-cols-[50px_repeat(4,minmax(0,1fr))] gap-3 border-b border-[#E4E4E4] px-5 py-3 text-sm font-semibold text-[#0C5B0D] sm:text-base">
@@ -177,9 +177,8 @@ export default function DashboardHome() {
               {!loading && !error && recentOrders.map(({ id, crop_name, quantity, price_per_kg, location }, index) => (
                 <div
                   key={id}
-                  className={`grid min-w-[560px] grid-cols-[50px_repeat(4,minmax(0,1fr))] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${
-                    index === recentOrders.length - 1 ? "" : "border-b border-[#E4E4E4]"
-                  }`}
+                  className={`grid min-w-[560px] grid-cols-[50px_repeat(4,minmax(0,1fr))] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === recentOrders.length - 1 ? "" : "border-b border-[#E4E4E4]"
+                    }`}
                 >
                   <span className="font-medium text-[#0C5B0D]">{id}</span>
                   <span>{crop_name ?? "—"}</span>
