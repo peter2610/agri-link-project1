@@ -1,7 +1,9 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# app.py
 from flask_cors import CORS
-from config import app, api
+from config import app, api, db
+from models import buyer, collaboration, dashboard, farmer, offer, order  # noqa: F401
 from routes.main_route import Main
 from routes.get_buyers_route import Buyers
 from routes.get_farmers_route import Farmers
@@ -16,10 +18,26 @@ from routes.collaboration_route import (
     ContributionResource,
     ContributionListResource
 )
+from routes.dashboard_route import DashboardResource, FarmerStatsResource
+from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
 
 
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://172.16.16.182:3000"]}}, supports_credentials=True,)    
+# ✅ Enable CORS for frontend connection
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://172.16.16.182:3000"
+        ]
+    }
+}, supports_credentials=True)
 
+# ✅ Ensure tables exist (runs once on startup)
+with app.app_context():
+    db.create_all()
+
+# ✅ Register Routes
 api.add_resource(Main, '/', endpoint='main')
 api.add_resource(Farmers, '/farmers', endpoint='farmers')
 api.add_resource(Buyers, '/buyers', endpoint='buyers')
@@ -33,5 +51,15 @@ api.add_resource(CollaborationDetailResource, '/collaborations/<int:collaboratio
 api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/contributions', endpoint='contribution')
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
 
+# Dashboard
+api.add_resource(DashboardResource, '/dashboard', '/dashboard/<int:farmer_id>')
+api.add_resource(FarmerStatsResource, '/farmer/<int:farmer_id>/stats')
+
+# Orders
+api.add_resource(OrderListResource, '/orders')
+api.add_resource(OrderDetailResource, '/orders/<int:order_id>')
+api.add_resource(OrderStatisticsResource, '/orders/statistics')
+
+# ✅ Run Server
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
