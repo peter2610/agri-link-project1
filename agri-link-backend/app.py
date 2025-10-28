@@ -16,7 +16,8 @@ from routes.collaboration_route import (
     CollaborationListResource,
     CollaborationDetailResource,
     ContributionResource,
-    ContributionListResource
+    ContributionListResource,
+    CropContributorsResource,
 )
 from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
@@ -50,6 +51,7 @@ api.add_resource(CollaborationListResource, '/collaborations', endpoint='collabo
 api.add_resource(CollaborationDetailResource, '/collaborations/<int:collaboration_id>', endpoint='collaboration_detail')
 api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/contributions', endpoint='contribution')
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
+api.add_resource(CropContributorsResource, '/collaborations/<int:collaboration_id>/crops/<int:crop_id>/contributors', endpoint='crop_contributors')
 
 # Dashboard
 api.add_resource(DashboardResource, '/dashboard', '/dashboard/<int:farmer_id>')

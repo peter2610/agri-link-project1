@@ -28,7 +28,11 @@ export default function Footer() {
                         <BiLogoInstagram size={27} className="fill-green-800 bg-" />
                     </div>
                 </Link>
+<<<<<<< HEAD
                 <Link href={"/"}>
+=======
+                <Link href={"/"} >
+>>>>>>> origin/peter
                     <div className="bg-lime-300 rounded-full p-3">
                         <BiLogoLinkedin size={27} className="fill-green-800 bg-" />
                     </div>
