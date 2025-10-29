@@ -9,9 +9,21 @@ import os
 from sqlalchemy import MetaData
 
 app = Flask(__name__)
+# --- Render / Local hybrid database setup ---
+# Prefer PostgreSQL if DATABASE_URL is set (Render)
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+if DATABASE_URL:
+    # Use Render PostgreSQL
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    # Use SQLite locally as fallback (the rest of your existing code handles this)
+    print("⚙️ Using local SQLite database (no DATABASE_URL found)")
 
 # Allow overriding SQLite path via env var (e.g., DB_PATH=/var/data/app.db on Render)
-db_path = os.getenv('DB_PATH', 'instance/app.db')
+#db_path = os.getenv('DB_PATH', 'instance/app.db')
 
 def _ensure_path(p):
     d = os.path.dirname(p) or '.'
