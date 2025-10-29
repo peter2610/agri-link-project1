@@ -3,7 +3,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # app.py
 from flask_cors import CORS
 from config import app, api, db
-from models import buyer, collaboration, dashboard, farmer, offer, order  # noqa: F401
 from routes.main_route import Main
 from routes.get_buyers_route import Buyers
 from routes.get_farmers_route import Farmers
@@ -21,6 +20,7 @@ from routes.collaboration_route import (
 )
 from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
+from routes.mailing_list_route import AddToMailingList, GetMailingList
 
 
 # ✅ Enable CORS for frontend connection
@@ -61,6 +61,9 @@ api.add_resource(FarmerStatsResource, '/farmer/<int:farmer_id>/stats')
 api.add_resource(OrderListResource, '/orders')
 api.add_resource(OrderDetailResource, '/orders/<int:order_id>')
 api.add_resource(OrderStatisticsResource, '/orders/statistics')
+
+api.add_resource(AddToMailingList, '/join_mailinglist')
+api.add_resource(GetMailingList, '/mailinglist')
 
 # ✅ Run Server
 if __name__ == '__main__':

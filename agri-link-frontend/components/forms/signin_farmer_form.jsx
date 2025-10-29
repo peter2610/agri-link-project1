@@ -3,10 +3,10 @@
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation";
+import { API } from "@/utils/api";
 
 export default function SigninFarmerForm() {
     const router = useRouter()
-    const API = "http://localhost:5555"
 
     const handleSignIn = async (e) => {
         e.preventDefault()
