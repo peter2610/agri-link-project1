@@ -38,7 +38,7 @@ export default function SideNavBar() {
         >
           <BiGroup /> Collaborations
         </Link>
-        <Link href="/assistant" className={itemBase}>
+        <Link href="/assistant" className={`${itemBase} ${pathname?.startsWith("/assistant") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
           <BiChat /> AI Assistant
         </Link>
       </div>
