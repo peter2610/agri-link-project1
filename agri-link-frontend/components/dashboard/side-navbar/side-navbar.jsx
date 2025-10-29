@@ -13,17 +13,17 @@ export default function SideNavBar() {
   const itemBase = "w-full cursor-pointer flex items-center gap-2 px-5 py-3 rounded-2xl";
 
   return (
-    <div className="h-screen inline-flex flex-col justify-between items-start px-15 py-20 bg-neutral-100 text-lg">
+    <div className="h-screen inline-flex flex-col justify-between items-start px-15 pt-10 pb-20 bg-neutral-100 text-lg">
       <div>
         <Link href={"/"}>
           <Image alt="logo" height={50} src={LogoBlack} />
         </Link>
       </div>
       <div className="flex flex-col items-start gap-4 text-green-800 w-full">
-        <Link href="/" className={`${itemBase} ${pathname === "/" ? "bg-green-50" : ""}`}>
+        <Link href="/farmer/dashboard" className={`${itemBase} ${pathname?.startsWith("/dashboard") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
           <BiHome /> Home
         </Link>
-        <Link href="/orders" className={itemBase}>
+        <Link href="/orders" className={`${itemBase} ${pathname?.startsWith("/orders") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
           <BiShoppingBag /> View Orders
         </Link>
         <Link

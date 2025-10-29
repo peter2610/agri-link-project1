@@ -33,7 +33,7 @@ export default function DashboardHome() {
       setError(null);
 
       try {
-        const data = await fetchJson(`/dashboard?farmer_id=${DEFAULT_FARMER_ID}`);
+        const data = await fetchJson(`/farmer/dashboard?farmer_id=${DEFAULT_FARMER_ID}`);
         if (!ignore) {
           setDashboard(data);
         }
@@ -79,9 +79,9 @@ export default function DashboardHome() {
   const recentOrders = dashboard?.recent_orders ?? [];
 
   return (
-    <main className="flex min-h-screen flex-col gap-10 bg-[#FAFAFA] pb-16">
+    <main className="flex min-h-screen flex-col gap-10">
       {/* Header */}
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 sm:flex-row items-center justify-between">
         <div>
           <p className="text-3xl font-semibold leading-tight text-[#0C5B0D]">
             Farmer’s Dashboard
@@ -99,7 +99,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick Summary Section */}
-      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-6 shadow-sm">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Quick Summary

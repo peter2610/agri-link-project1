@@ -53,8 +53,8 @@ api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/c
 api.add_resource(ContributionListResource, '/collaborations/<int:collaboration_id>/contributions/list', endpoint='contribution_list')
 api.add_resource(CropContributorsResource, '/collaborations/<int:collaboration_id>/crops/<int:crop_id>/contributors', endpoint='crop_contributors')
 
-# Dashboard
-api.add_resource(DashboardResource, '/dashboard', '/dashboard/<int:farmer_id>')
+# Farmer's Dashboard
+api.add_resource(DashboardResource, '/farmer/dashboard', '/farmer/dashboard/<int:farmer_id>')
 api.add_resource(FarmerStatsResource, '/farmer/<int:farmer_id>/stats')
 
 # Orders

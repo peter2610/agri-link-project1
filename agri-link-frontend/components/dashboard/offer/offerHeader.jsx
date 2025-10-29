@@ -4,7 +4,7 @@ import { UserRound } from "lucide-react";
 
 export default function OfferHeader() {
   return (
-    <div className="flex items-start justify-between mb-6">
+    <div className="flex items-start justify-between sm:px-8 lg:px-12 py-10">
       <div>
         <h1 className="text-[28px] font-extrabold text-green-700 leading-tight">
           Offer
