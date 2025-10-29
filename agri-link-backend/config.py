@@ -9,6 +9,18 @@ import os
 from sqlalchemy import MetaData
 
 app = Flask(__name__)
+
+# --- helper: ensure a valid file path for SQLite ---
+def _ensure_path(p):
+    d = os.path.dirname(p) or '.'
+    os.makedirs(d, exist_ok=True)
+    try:
+        with open(p, 'a'):
+            pass
+        return p
+    except Exception:
+        return None
+
 # --- Render / Local hybrid database setup ---
 # Prefer PostgreSQL if DATABASE_URL is set (Render)
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -34,16 +46,6 @@ else:
         db_path = resolved
 
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-
-def _ensure_path(p):
-    d = os.path.dirname(p) or '.'
-    os.makedirs(d, exist_ok=True)
-    try:
-        with open(p, 'a'):
-            pass
-        return p
-    except Exception:
-        return None
 
  
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
