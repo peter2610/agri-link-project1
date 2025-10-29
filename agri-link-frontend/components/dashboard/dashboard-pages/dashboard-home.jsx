@@ -30,6 +30,7 @@ export default function DashboardHome() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
     let ignore = false;
@@ -59,12 +60,21 @@ export default function DashboardHome() {
 
     loadDashboard();
 
+    // Load logged-in name from localStorage (client only)
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
+
     return () => {
       ignore = true;
     };
   }, []);
 
-  const farmerName = dashboard?.farmer?.full_name ?? "User";
+  const farmerName = (dashboard?.farmer?.full_name ?? userName) || "User";
   const summaryStats = [
     { title: "Orders Completed", value: formatNumber(dashboard?.completed_orders) },
     { title: "Pending Orders", value: formatNumber(dashboard?.pending_orders) },

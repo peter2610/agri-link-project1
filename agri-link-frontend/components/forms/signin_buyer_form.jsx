@@ -25,6 +25,9 @@ export default function SigninBuyerForm() {
 
             if (response.ok) {
                 toast.success(`Welcome back, ${data.full_name.split(" ")[0]}!`)
+                try {
+                    window.localStorage.setItem('agri_user', JSON.stringify({ full_name: data.full_name, role: 'buyer' }))
+                } catch (_) { }
                 router.push('/farmer/dashboard')
             } else {
                 toast.error(`${data.error}`)

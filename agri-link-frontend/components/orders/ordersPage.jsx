@@ -44,6 +44,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
     let ignore = false;
@@ -81,6 +82,16 @@ export default function OrdersPage() {
       ignore = true;
     };
   }, [status]);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
+  }, []);
 
   const handleCollaborate = async (order) => {
     try {
@@ -141,7 +152,7 @@ export default function OrdersPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
               <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
             </div>
-            <p className="text-base font-medium text-gray-700">Welcome, User</p>
+            <p className="text-base font-medium text-gray-700">Welcome, {userName.split(" ")[0]}</p>
           </div>
         </header>
 

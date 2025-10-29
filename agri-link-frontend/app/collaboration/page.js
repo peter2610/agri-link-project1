@@ -17,6 +17,7 @@ import { toast } from "react-hot-toast";
 
 export default function CollaborationHub() {
   const [orders, setOrders] = useState([]);
+  const [userName, setUserName] = useState("User");
   const router = useRouter();
   const toPrice = (val) => {
     if (val == null) return "-";
@@ -62,6 +63,15 @@ export default function CollaborationHub() {
       }
     }
     fetchOrders();
+
+    // load logged-in name
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
   }, []);
 
   const handleJoinCollaboration = (orderId) => {
@@ -79,7 +89,7 @@ export default function CollaborationHub() {
             <p className="text-gray-600 -mt-1">Collaborate with other farmers on orders</p>
           </div>
           <div className="flex items-center gap-3 text-green-900">
-            <span>Welcome, <span className="font-semibold">User</span></span>
+            <span>Welcome, <span className="font-semibold">{userName.split(" ")[0]}</span></span>
             <div className="h-9 w-9 rounded-full border-2 border-green-700 grid place-items-center">
               <UserRound size={18} />
             </div>
