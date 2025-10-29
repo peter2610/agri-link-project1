@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const ACTIVE = "active";
 const INACTIVE = "inactive";
@@ -37,6 +39,7 @@ const formatNumber = (value, options) => {
 };
 
 export default function OrdersPage() {
+  const router = useRouter();
   const [status, setStatus] = useState(ACTIVE);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,12 +53,15 @@ export default function OrdersPage() {
       setError(null);
 
       try {
-        const statusParam = STATUS_QUERY_MAP[status];
-        const query = statusParam ? `?status=${statusParam}` : "";
-        const data = await fetchJson(`/orders${query}`);
+        // Backend offers API: align with OfferForm which uses GET/POST /offer
+        // Some backends may support filtering by status; if not, ignore.
+        // We fetch the list of offers directly.
+        const data = await fetchJson(`/offer`);
 
         if (!ignore) {
-          setOrders(data?.orders ?? []);
+          // Accept both array payloads and objects with orders property
+          const list = Array.isArray(data) ? data : (data?.orders ?? []);
+          setOrders(list);
         }
       } catch (fetchError) {
         if (!ignore) {
@@ -75,6 +81,47 @@ export default function OrdersPage() {
       ignore = true;
     };
   }, [status]);
+
+  const handleCollaborate = async (order) => {
+    try {
+      const crop_name = order.crop_name ?? order.crop;
+      const price = order.price_per_kg ?? order.price;
+      const weight_demand = order.quantity;
+      const location = order.location;
+
+      if (!crop_name || !price || !weight_demand || !location) {
+        return toast.error("Missing required fields for collaboration");
+      }
+
+      const payload = {
+        location,
+        crops: [
+          {
+            crop_name,
+            price,
+            weight_demand,
+          },
+        ],
+        source_order_id: order.id,
+      };
+
+      const res = await fetch(`/api/collaborations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const msg = errJson?.message || errJson?.error || `Failed to create collaboration (${res.status})`;
+        return toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
+      }
+      toast.success("Collaboration created");
+      router.push("/collaboration");
+    } catch (e) {
+      const msg = e?.message || "Failed to create collaboration";
+      toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
+  };
 
 
 
@@ -156,30 +203,30 @@ export default function OrdersPage() {
 
                 {!loading && !error && orders.map((order, index) => {
                   const buttonColor = collaborateColors[index % collaborateColors.length];
-                  const priceDisplay = formatNumber(order.price_per_kg, {
+                  const priceDisplay = formatNumber(order.price_per_kg ?? order.price, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   });
 
                   return (
                     <div
-                      key={`${status}-${order.id}`}
+                      key={`${status}-${order.id ?? index}`}
                       className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
                         }`}
                     >
-                      <span className="font-medium text-[#0C5B0D]">{order.id}</span>
-                      <span>{order.crop_name ?? "—"}</span>
+                      <span className="font-medium text-[#0C5B0D]">{order.id ?? index + 1}</span>
+                      <span>{order.crop_name ?? order.crop ?? "—"}</span>
                       <span>{formatNumber(order.quantity)}</span>
                       <span>{priceDisplay}</span>
                       <span>{order.location ?? "—"}</span>
                       <span className="flex justify-end">
-                        <Link
-                          href="#"
+                        <button
+                          onClick={() => handleCollaborate(order)}
                           className="rounded-[9px] px-3 py-2 text-sm font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5 sm:text-base"
                           style={{ backgroundColor: buttonColor }}
                         >
                           Collaborate
-                        </Link>
+                        </button>
                       </span>
                     </div>
                   );

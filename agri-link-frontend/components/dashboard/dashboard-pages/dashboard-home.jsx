@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
-import { fetchJson } from "@/lib/api";
 
 const DEFAULT_FARMER_ID = 1;
 
@@ -20,6 +19,13 @@ const formatNumber = (value, options) => {
   return numeric.toLocaleString(undefined, options);
 };
 
+const formatCompact = (value) => {
+  if (value === null || value === undefined) return "—";
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return String(value);
+  return new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(numeric);
+};
+
 export default function DashboardHome() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +39,9 @@ export default function DashboardHome() {
       setError(null);
 
       try {
-        const data = await fetchJson(`/farmer/dashboard?farmer_id=${DEFAULT_FARMER_ID}`);
+        const res = await fetch(`/api/farmer/dashboard?farmer_id=${DEFAULT_FARMER_ID}`, { credentials: "include" });
+        if (!res.ok) throw new Error(`Failed to load dashboard (${res.status})`);
+        const data = await res.json();
         if (!ignore) {
           setDashboard(data);
         }
@@ -62,10 +70,7 @@ export default function DashboardHome() {
     { title: "Pending Orders", value: formatNumber(dashboard?.pending_orders) },
     {
       title: "Total Earnings (KSH)",
-      value: formatNumber(dashboard?.total_revenue_value, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+      value: formatCompact(dashboard?.total_revenue_value),
     },
     {
       title: "Total Crops Sold (KG)",

@@ -14,22 +14,23 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function CollaborationDetails() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
 
   useEffect(() => {
     async function fetchOrder() {
       try {
-        const res = await fetch(`${baseUrl}/collaborations/${id}`);
+        const res = await fetch(`/api/collaborations/${id}`);
         if (!res.ok) throw new Error(`Failed to fetch collaboration (${res.status})`);
         const data = await res.json();
         setOrder(data);
       } catch (err) {
         console.error("Error fetching order:", err);
+        toast.error(err?.message || "Failed to load collaboration");
       }
     }
     fetchOrder();
@@ -38,7 +39,7 @@ export default function CollaborationDetails() {
   const handleSubmit = async ({ farmerName, cropId, weight }) => {
     if (!weight || weight <= 0) return alert("Enter a valid weight");
     try {
-      const res = await fetch(`${baseUrl}/collaborations/${id}/contributions`, {
+      const res = await fetch(`/api/collaborations/${id}/contributions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ farmer_name: farmerName, crop_id: Number(cropId), weight: Number(weight) }),
@@ -46,9 +47,12 @@ export default function CollaborationDetails() {
       if (!res.ok) throw new Error(`Failed to contribute (${res.status})`);
       const updated = await res.json();
       // Refresh details with updated crops
-      setOrder((prev) => prev ? { ...prev, crops: updated.crops ?? prev.crops } : prev);
+      setOrder((prev) => (prev ? { ...prev, crops: updated.crops ?? prev.crops } : prev));
+      toast.success("Contribution added");
+      router.push("/collaboration");
     } catch (err) {
       console.error("Error adding collaboration:", err);
+      toast.error(err?.message || "Failed to add contribution");
     }
   };
 

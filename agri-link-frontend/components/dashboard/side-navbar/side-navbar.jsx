@@ -20,7 +20,7 @@ export default function SideNavBar() {
         </Link>
       </div>
       <div className="flex flex-col items-start gap-4 text-green-800 w-full">
-        <Link href="/farmer/dashboard" className={`${itemBase} ${pathname?.startsWith("/dashboard") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+        <Link href="/farmer/dashboard" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
           <BiHome /> Home
         </Link>
         <Link href="/orders" className={`${itemBase} ${pathname?.startsWith("/orders") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>

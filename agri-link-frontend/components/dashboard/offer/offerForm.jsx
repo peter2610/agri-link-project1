@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { fetchJson } from "@/lib/api";
 
 export default function OfferForm() {
   const router = useRouter();
@@ -16,7 +17,6 @@ export default function OfferForm() {
     postHarvest: "",
   });
   const [loading, setLoading] = useState(false);
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,26 +46,17 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await fetch(`${baseUrl}/offer`, {
+      const data = await fetchJson(`/offer`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: {
           crop_name: cropName,
           category,
           quantity: weight,
           price,
           location,
           post_harvest_period: postHarvest,
-        }),
+        },
       });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        const errMsg = errJson?.message || errJson?.error || `Failed to create offer (${res.status})`;
-        return toast.error(errMsg);
-      }
-
-      const data = await res.json();
       toast.success(data?.message || "Offer created successfully");
 
       setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
@@ -76,7 +67,7 @@ export default function OfferForm() {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Network error creating offer");
+      toast.error(err?.message || "Network error creating offer");
     } finally {
       setLoading(false);
     }
@@ -86,18 +77,12 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await fetch(`${baseUrl}/offer`, { method: "GET" });
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        const errMsg = errJson?.message || errJson?.error || `Failed to fetch offers (${res.status})`;
-        return toast.error(errMsg);
-      }
-      const list = await res.json();
+      const list = await fetchJson(`/offer`, { method: "GET" });
       console.log("Created offers:", list);
       toast.success(`Fetched ${Array.isArray(list) ? list.length : 0} offers`);
     } catch (err) {
       console.error(err);
-      toast.error("Network error fetching offers");
+      toast.error(err?.message || "Network error fetching offers");
     } finally {
       setLoading(false);
     }

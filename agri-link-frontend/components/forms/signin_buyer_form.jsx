@@ -25,7 +25,7 @@ export default function SigninBuyerForm() {
 
             if (response.ok) {
                 toast.success(`Welcome back, ${data.full_name.split(" ")[0]}!`)
-                router.push('/dashboard')
+                router.push('/farmer/dashboard')
             } else {
                 toast.error(`${data.error}`)
             }
