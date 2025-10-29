@@ -2,7 +2,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin # type: ignore[import]
 from datetime import datetime
 from config import db, bcrypt
-# from models.offer import Offer, Crop
+from models.offer import Offer, Crop
 class Farmer(db.Model, SerializerMixin):
 	__tablename__ = 'farmers'
     

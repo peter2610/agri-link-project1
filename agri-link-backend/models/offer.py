@@ -1,7 +1,7 @@
 from datetime import datetime
 from config import db
 from sqlalchemy import Enum
-from models.farmer import Farmer  # ✅ Import the real Farmer model
+# from models.farmer import Farmer  # ✅ Import the real Farmer model
 
 CROP_CATEGORIES = ('Cereals', 'Vegetables', 'Fruits', 'Export Crop', 'Other')
 
@@ -13,6 +13,7 @@ class Crop(db.Model):
     name = db.Column(db.String(100), nullable=False)
     category = db.Column(Enum(*CROP_CATEGORIES, name='crop_categories'), nullable=False)
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
     offers = db.relationship('Offer', backref='crop', lazy=True)

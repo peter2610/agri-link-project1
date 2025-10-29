@@ -76,13 +76,13 @@ export default function OrdersPage() {
     };
   }, [status]);
 
-  
+
 
   return (
     <div className="flex-1 min-h-screen bg-[#FAFAFA] px-4 sm:px-8 lg:px-12 py-10 text-[#0C5B0D]">
       <main className="flex flex-col gap-10">
         {/* Header */}
-        <header className="mx-auto flex w-full max-w-[1024px] flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <header className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold leading-tight">Orders</h1>
             <p className="mt-1 text-lg text-[#0C5B0D]/80">
@@ -99,24 +99,22 @@ export default function OrdersPage() {
         </header>
 
         {/* Orders Section */}
-        <section className="mx-auto w-full max-w-[1024px] rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+        <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
           <div className="flex-1">
             {/* Tabs */}
             <div className="mb-5 flex flex-wrap items-center gap-4 text-lg font-medium">
               <button
                 onClick={() => setStatus(ACTIVE)}
-                className={`transition-colors ${
-                  status === ACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
-                }`}
+                className={`transition-colors ${status === ACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
+                  }`}
               >
                 Active
               </button>
-              <span className="hidden h-6 w-[2px] bg-[#0C5B0D]/50 sm:inline" aria-hidden="true" />
+              <span className="hidden h-6 w-0.5 bg-[#0C5B0D]/50 sm:inline" aria-hidden="true" />
               <button
                 onClick={() => setStatus(INACTIVE)}
-                className={`transition-colors ${
-                  status === INACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
-                }`}
+                className={`transition-colors ${status === INACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
+                  }`}
               >
                 Inactive
               </button>
@@ -126,7 +124,7 @@ export default function OrdersPage() {
             </div>
 
             {/* Table */}
-            <div className="overflow-hidden rounded-[16px] bg-white shadow">
+            <div className="overflow-hidden rounded-2xl bg-white shadow">
               {/* Table Header */}
               <div className="grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 border-b border-[#E4E4E4] px-5 py-3 text-sm font-semibold text-[#0C5B0D] sm:text-base">
                 <span>#</span>
@@ -166,9 +164,8 @@ export default function OrdersPage() {
                   return (
                     <div
                       key={`${status}-${order.id}`}
-                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${
-                        index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
-                      }`}
+                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
+                        }`}
                     >
                       <span className="font-medium text-[#0C5B0D]">{order.id}</span>
                       <span>{order.crop_name ?? "—"}</span>
