@@ -19,11 +19,21 @@ if DATABASE_URL:
     # Use Render PostgreSQL
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 else:
-    # Use SQLite locally as fallback (the rest of your existing code handles this)
+    # Use SQLite locally as fallback
     print("⚙️ Using local SQLite database (no DATABASE_URL found)")
+    # Allow overriding SQLite path via env var (e.g., DB_PATH=/var/data/app.db on Render)
+    db_path = os.getenv('DB_PATH', 'instance/app.db')
 
-# Allow overriding SQLite path via env var (e.g., DB_PATH=/var/data/app.db on Render)
-#db_path = os.getenv('DB_PATH', 'instance/app.db')
+    # Resolve to a writable path; fall back to /tmp if necessary
+    resolved = _ensure_path(db_path)
+    if not resolved:
+        fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
+        resolved = _ensure_path(fallback)
+        db_path = resolved or db_path
+    else:
+        db_path = resolved
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 def _ensure_path(p):
     d = os.path.dirname(p) or '.'
@@ -35,15 +45,7 @@ def _ensure_path(p):
     except Exception:
         return None
 
-resolved = _ensure_path(db_path)
-if not resolved:
-    fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
-    resolved = _ensure_path(fallback)
-    db_path = resolved or db_path
-else:
-    db_path = resolved
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+ 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
