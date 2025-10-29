@@ -4,11 +4,18 @@ from flask_restful import Api
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 import secrets
+import os
 
 from sqlalchemy import MetaData
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+
+# Allow overriding SQLite path via env var (e.g., DB_PATH=/var/data/app.db on Render)
+db_path = os.getenv('DB_PATH', 'instance/app.db')
+# Ensure directory exists for SQLite file
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 

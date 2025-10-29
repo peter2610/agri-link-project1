@@ -23,16 +23,22 @@ from routes.order_route import OrderListResource, OrderDetailResource, OrderStat
 from routes.mailing_list_route import AddToMailingList, GetMailingList
 
 
-# ✅ Enable CORS for frontend connection
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://172.16.16.182:3000"
-        ]
-    }
-}, supports_credentials=True)
+# ✅ Enable CORS for frontend connection (env-driven)
+# Set ALLOWED_ORIGINS as a comma-separated list in your environment, e.g.:
+#   ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.yourdomain.com
+default_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://172.16.16.182:3000",
+]
+env_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
+allowed_origins = [o.strip() for o in env_origins.split(",") if o.strip()] or default_origins
+
+CORS(
+    app,
+    resources={r"/*": {"origins": allowed_origins}},
+    supports_credentials=True,
+)
 
 # ✅ Ensure tables exist (runs once on startup)
 with app.app_context():
