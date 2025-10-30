@@ -46,16 +46,25 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
+      const body = {
+        crop_name: cropName,
+        category,
+        quantity: weight,
+        price,
+        location,
+        post_harvest_period: postHarvest,
+      };
+      // Optional dev fallback: include farmer_id from env to avoid third-party cookie issues on localhost
+      const fallbackFarmerId = process.env.NEXT_PUBLIC_FALLBACK_FARMER_ID
+        ? Number(process.env.NEXT_PUBLIC_FALLBACK_FARMER_ID)
+        : NaN;
+      if (Number.isFinite(fallbackFarmerId) && fallbackFarmerId > 0) {
+        body.farmer_id = fallbackFarmerId;
+      }
+
       const data = await fetchJson(`/offer`, {
         method: "POST",
-        body: {
-          crop_name: cropName,
-          category,
-          quantity: weight,
-          price,
-          location,
-          post_harvest_period: postHarvest,
-        },
+        body,
       });
       toast.success(data?.message || "Offer created successfully");
 
