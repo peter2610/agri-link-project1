@@ -36,7 +36,42 @@ class OfferResource(Resource):
     # GET all offers for farmer_id=1 (testing)
     # ======================================
     def get(self):
-        return [], 200
+        # Resolve farmer_id from query/header/session
+        farmer_id = (
+            request.args.get('farmer_id')
+            or request.headers.get('X-Farmer-Id')
+            or session.get('farmer_id')
+        )
+        if not farmer_id:
+            return [], 200
+
+        # Use raw SQL with CAST to TEXT for portability across SQLite/Postgres
+        rows = db.session.execute(text(
+            """
+            SELECT o.id, o.quantity, o.price, o.location, o.post_harvest_period, o.status,
+                   COALESCE(c.name, 'Unknown') AS crop_name,
+                   COALESCE(CAST(c.category AS TEXT), 'Unknown') AS category
+            FROM offers o
+            LEFT JOIN crops c ON c.id = o.crop_id
+            WHERE o.farmer_id = :fid
+            ORDER BY o.id DESC
+            """
+        ), {"fid": int(farmer_id)}).mappings().all()
+
+        result = [
+            {
+                'id': r['id'],
+                'crop_name': r['crop_name'],
+                'category': r['category'],
+                'quantity': r['quantity'],
+                'price': r['price'],
+                'location': r['location'],
+                'post_harvest_period': r['post_harvest_period'],
+                'status': r['status'],
+            }
+            for r in rows
+        ]
+        return result, 200
 
     # ======================================
     # POST create new offer
@@ -52,18 +87,16 @@ class OfferResource(Resource):
                 or request.args.get('farmer_id')
             )
             if not farmer_id:
-                allow_dev = os.getenv('ALLOW_DEV_OFFER_NO_AUTH', 'false').lower() == 'true'
-                fallback_id = os.getenv('FALLBACK_FARMER_ID')
-                if allow_dev:
-                    if fallback_id:
-                        farmer_id = int(fallback_id)
-                    else:
-                        # Last-resort: use the first farmer in DB if exists (dev only)
-                        first_farmer = db.session.query(Farmer.id).order_by(Farmer.id.asc()).first()
-                        if first_farmer:
-                            farmer_id = int(first_farmer[0])
+                # No authentication required: choose first farmer or create a demo one
+                first_farmer = db.session.query(Farmer.id).order_by(Farmer.id.asc()).first()
+                if first_farmer:
+                    farmer_id = int(first_farmer[0])
                 else:
-                    return {'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}, 401
+                    # Auto-create a demo farmer if none exists
+                    demo = Farmer(full_name='Demo Farmer', email='demo@example.com')
+                    db.session.add(demo)
+                    db.session.commit()
+                    farmer_id = demo.id
 
             # Normalize alternative keys into expected names
             if not data.get('category') and data.get('crop_category'):

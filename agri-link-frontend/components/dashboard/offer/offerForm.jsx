@@ -62,8 +62,14 @@ export default function OfferForm() {
         body.farmer_id = fallbackFarmerId;
       }
 
+      const headers = {};
+      if (Number.isFinite(fallbackFarmerId) && fallbackFarmerId > 0) {
+        headers["X-Farmer-Id"] = String(fallbackFarmerId);
+      }
+
       const data = await fetchJson(`/offer`, {
         method: "POST",
+        headers,
         body,
       });
       toast.success(data?.message || "Offer created successfully");
@@ -72,7 +78,7 @@ export default function OfferForm() {
 
       if (action === "create") {
         toast.success("Redirecting to Orders…");
-        router.push("/orders");
+        router.push("/orders?created=1");
       }
     } catch (err) {
       console.error(err);
