@@ -5,6 +5,7 @@ from models.offer import Offer, Crop, CROP_CATEGORIES
 from models.farmer import Farmer
 from sqlalchemy import text
 from uuid import uuid4
+import os
 # No circular import anymore
 
 # ===============================
@@ -43,10 +44,15 @@ class OfferResource(Resource):
     def post(self):
         try:
             data = offer_parser.parse_args()
-            # Prefer logged-in farmer from session; fallback to explicit body for testing only
+            # Prefer logged-in farmer from session; fallback to explicit body for testing
             farmer_id = session.get('farmer_id') or data.get('farmer_id')
             if not farmer_id:
-                return {'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}, 401
+                allow_dev = os.getenv('ALLOW_DEV_OFFER_NO_AUTH', 'false').lower() == 'true'
+                fallback_id = os.getenv('FALLBACK_FARMER_ID')
+                if allow_dev and fallback_id:
+                    farmer_id = int(fallback_id)
+                else:
+                    return {'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}, 401
 
             # Normalize alternative keys into expected names
             if not data.get('category') and data.get('crop_category'):
