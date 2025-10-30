@@ -22,6 +22,7 @@ from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
 from routes.mailing_list_route import AddToMailingList, GetMailingList
 from routes.ai_chat_route import AiChat
+from routes.signin_farmer_route import CheckSessionFarmer
 
 
 # ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
@@ -141,6 +142,8 @@ api.add_resource(OrderStatisticsResource, '/orders/statistics')
 api.add_resource(AddToMailingList, '/join_mailinglist')
 api.add_resource(GetMailingList, '/mailinglist')
 api.add_resource(AiChat, "/ai/chat")
+api.add_resource(CheckSessionFarmer, "/farmer/check_session")
+# api.add_resource(CheckSessionBuyer, "/buyer/check_session")
 
 # ✅ Run Server
 if __name__ == '__main__':

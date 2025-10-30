@@ -18,3 +18,15 @@ class SigninFarmer(Resource):
             return farmer.to_dict(), 200
         
         return {"error": "Invalid email or password."}, 401
+    
+class CheckSessionFarmer(Resource):
+    def get(self):
+        farmer_id = session.get('farmer_id')
+        if not farmer_id:
+            return {}, 401
+        
+        farmer = Farmer.query.filter(Farmer.id == farmer_id).first()
+        if not farmer:
+            return {}, 401
+        return farmer.to_dict(), 200
+    

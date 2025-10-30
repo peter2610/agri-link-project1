@@ -28,7 +28,7 @@ export default function SigninBuyerForm() {
                 try {
                     window.localStorage.setItem('agri_user', JSON.stringify({ full_name: data.full_name, role: 'buyer' }))
                 } catch (_) { }
-                router.push('/farmer/dashboard')
+                router.push('/buyer/dashboard/home')
             } else {
                 toast.error(`${data.error}`)
             }
