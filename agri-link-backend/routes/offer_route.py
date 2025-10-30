@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from flask import jsonify, session
+from flask import jsonify, session, request
 from config import db
 from models.offer import Offer, Crop, CROP_CATEGORIES
 from models.farmer import Farmer
@@ -44,13 +44,24 @@ class OfferResource(Resource):
     def post(self):
         try:
             data = offer_parser.parse_args()
-            # Prefer logged-in farmer from session; fallback to explicit body for testing
-            farmer_id = session.get('farmer_id') or data.get('farmer_id')
+            # Resolve farmer_id from multiple sources (session, body, header, query)
+            farmer_id = (
+                session.get('farmer_id')
+                or data.get('farmer_id')
+                or request.headers.get('X-Farmer-Id')
+                or request.args.get('farmer_id')
+            )
             if not farmer_id:
                 allow_dev = os.getenv('ALLOW_DEV_OFFER_NO_AUTH', 'false').lower() == 'true'
                 fallback_id = os.getenv('FALLBACK_FARMER_ID')
-                if allow_dev and fallback_id:
-                    farmer_id = int(fallback_id)
+                if allow_dev:
+                    if fallback_id:
+                        farmer_id = int(fallback_id)
+                    else:
+                        # Last-resort: use the first farmer in DB if exists (dev only)
+                        first_farmer = db.session.query(Farmer.id).order_by(Farmer.id.asc()).first()
+                        if first_farmer:
+                            farmer_id = int(first_farmer[0])
                 else:
                     return {'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}, 401
 
