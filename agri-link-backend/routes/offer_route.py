@@ -29,28 +29,13 @@ offer_parser.add_argument('post_harvest_period_days', type=int, location='json')
 
 
 class OfferResource(Resource):
+    def options(self):
+        return '', 204
     # ======================================
     # GET all offers for farmer_id=1 (testing)
     # ======================================
     def get(self):
-        farmer_id = session.get('farmer_id')
-        if not farmer_id:
-            return jsonify({'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}), 401
-        offers = Offer.query.filter_by(farmer_id=farmer_id).all()
-        result = [
-            {
-                'id': offer.id,
-                'crop_name': offer.crop.name if offer.crop else "Unknown",
-                'category': offer.crop.category if offer.crop else "Unknown",
-                'quantity': offer.quantity,
-                'price': offer.price,
-                'location': offer.location,
-                'post_harvest_period': offer.post_harvest_period,
-                'status': offer.status
-            }
-            for offer in offers
-        ]
-        return jsonify(result)
+        return [], 200
 
     # ======================================
     # POST create new offer
@@ -61,7 +46,7 @@ class OfferResource(Resource):
             # Prefer logged-in farmer from session; fallback to explicit body for testing only
             farmer_id = session.get('farmer_id') or data.get('farmer_id')
             if not farmer_id:
-                return jsonify({'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}), 401
+                return {'error': 'Not authenticated', 'details': 'No farmer session. Please sign in.'}, 401
 
             # Normalize alternative keys into expected names
             if not data.get('category') and data.get('crop_category'):
@@ -77,19 +62,19 @@ class OfferResource(Resource):
             # Validation
             required_fields = ['crop_name', 'category', 'quantity', 'price']
             if not all(data.get(field) for field in required_fields):
-                return jsonify({'error': 'Missing required fields'}), 400
+                return {'error': 'Missing required fields'}, 400
 
             # Ensure the farmer exists to avoid foreign key failures
             farmer = Farmer.query.get(farmer_id)
             if not farmer:
-                return jsonify({'error': 'Farmer not found'}), 404
+                return {'error': 'Farmer not found'}, 404
 
             # Normalize category (map common test value 'Grains' to Enum 'Cereals')
             raw_category = data.get('category')
             cat_map = {'Grains': 'Cereals', 'grains': 'Cereals'}
             normalized_category = cat_map.get(raw_category, raw_category)
             if normalized_category not in CROP_CATEGORIES:
-                return jsonify({'error': f"Invalid category '{raw_category}'. Allowed: {', '.join(CROP_CATEGORIES)}"}), 400
+                return {'error': f"Invalid category '{raw_category}'. Allowed: {', '.join(CROP_CATEGORIES)}"}, 400
             data['category'] = normalized_category
 
             # Remove legacy bad test data: convert any 'Grains' to 'Cereals' in DB
@@ -111,7 +96,7 @@ class OfferResource(Resource):
                     crop_id = new_crop.id
                 except Exception as e:
                     db.session.rollback()
-                    return jsonify({'error': 'Failed to create crop', 'details': str(e)}), 400
+                    return {'error': 'Failed to create crop', 'details': str(e)}, 400
 
             # Create offer
             try:
@@ -128,12 +113,12 @@ class OfferResource(Resource):
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
-                return jsonify({'error': 'Failed to create offer', 'details': str(e)}), 400
+                return {'error': 'Failed to create offer', 'details': str(e)}, 400
 
-            return jsonify({'message': 'Offer created successfully', 'offer_id': offer.id})
+            return {'message': 'Offer created successfully', 'offer_id': offer.id}, 200
         except Exception as e:
             db.session.rollback()
-            return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+            return {'error': 'Internal Server Error', 'details': str(e)}, 500
 
     # ======================================
     # PUT update offer (pass offer_id in JSON)
@@ -144,11 +129,11 @@ class OfferResource(Resource):
         offer_id = data.get('id')
 
         if not offer_id:
-            return jsonify({'error': 'Offer id is required for update'}), 400
+            return {'error': 'Offer id is required for update'}, 400
 
         offer = Offer.query.filter_by(id=offer_id, farmer_id=farmer_id).first()
         if not offer:
-            return jsonify({'error': 'Offer not found'}), 404
+            return {'error': 'Offer not found'}, 404
 
         # Update fields
         if data.get('quantity') is not None:
@@ -163,7 +148,7 @@ class OfferResource(Resource):
             offer.status = data['status']
 
         db.session.commit()
-        return jsonify({'message': 'Offer updated successfully'})
+        return {'message': 'Offer updated successfully'}, 200
 
     # ======================================
     # DELETE offer (pass offer_id in JSON)
@@ -177,8 +162,8 @@ class OfferResource(Resource):
 
         offer = Offer.query.filter_by(id=offer_id, farmer_id=farmer_id).first()
         if not offer:
-            return jsonify({'error': 'Offer not found'}), 404
+            return {'error': 'Offer not found'}, 404
 
         db.session.delete(offer)
         db.session.commit()
-        return jsonify({'message': 'Offer deleted successfully'})
+        return {'message': 'Offer deleted successfully'}, 200

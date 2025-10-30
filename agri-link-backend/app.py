@@ -73,6 +73,42 @@ CORS(
     supports_credentials=True,
 )
 
+# ----- Global JSON error handlers -----
+from flask import jsonify
+
+def _json_error(message, status, details=None):
+    payload = {"error": message}
+    if details:
+        payload["details"] = str(details)
+    response = jsonify(payload)
+    response.status_code = status
+    return response
+
+@app.errorhandler(400)
+def handle_400(e):
+    return _json_error("Bad Request", 400, getattr(e, "description", None))
+
+@app.errorhandler(401)
+def handle_401(e):
+    return _json_error("Unauthorized", 401, getattr(e, "description", None))
+
+@app.errorhandler(403)
+def handle_403(e):
+    return _json_error("Forbidden", 403, getattr(e, "description", None))
+
+@app.errorhandler(404)
+def handle_404(e):
+    return _json_error("Not Found", 404, getattr(e, "description", None))
+
+@app.errorhandler(422)
+def handle_422(e):
+    return _json_error("Unprocessable Entity", 422, getattr(e, "description", None))
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Surface details to help diagnose production errors quickly
+    return _json_error("Internal Server Error", 500, e)
+
 # ✅ Ensure tables exist (runs once on startup)
 with app.app_context():
     db.create_all()
