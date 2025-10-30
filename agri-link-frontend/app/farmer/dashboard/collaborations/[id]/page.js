@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import CropRow from "../../../components/dashboard/collaboration/CropRow";
-import ContributionForm from "../../../components/dashboard/collaboration/ContributionForm";
-import Sidebar from "../../../components/dashboard/side-navbar/side-navbar";
+import CropRow from "../../../../../components/dashboard/collaboration/CropRow";
+import ContributionForm from "../../../../../components/dashboard/collaboration/ContributionForm";
+import Sidebar from "../../../../../components/dashboard/side-navbar/side-navbar";
 import {
   Home,
   ClipboardList,
@@ -14,7 +14,11 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
+<<<<<<< HEAD:agri-link-frontend/app/collaboration/[id]/page.js
 import { toast } from "react-hot-toast";
+=======
+import DashboardHeader from "@/components/dashboard/header/dashboard-header";
+>>>>>>> 262cf45 (Added AI chat):agri-link-frontend/app/farmer/dashboard/collaborations/[id]/page.js
 
 export default function CollaborationDetails() {
   const { id } = useParams();
@@ -66,22 +70,10 @@ export default function CollaborationDetails() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
-
       <main className="flex-1 flex flex-col px-10 py-8">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-[28px] font-extrabold text-green-700 leading-tight">Collaboration Hub</h1>
-            <p className="text-gray-600 -mt-1">Collaborate with other farmers on orders</p>
-          </div>
-          <div className="flex items-center gap-3 text-green-900">
-            <span>Welcome, <span className="font-semibold">User</span></span>
-            <div className="h-9 w-9 rounded-full border-2 border-green-700 grid place-items-center">
-              <UserRound size={18} />
-            </div>
-          </div>
-        </div>
+        <DashboardHeader title={"Collaboration Hub"} subtitle={"Collaborate with other farmers on orders"} />
 
-        <div className="bg-[#F4F7F4] rounded-[24px] p-6 md:p-8">
+        <div className="bg-[#F4F7F4] rounded-3xl p-6 md:p-8">
           <div className="flex items-center gap-3 px-2 md:px-4">
             <span className="text-green-800 font-semibold">Active</span>
             <span className="text-gray-400">|</span>

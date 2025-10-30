@@ -1,5 +1,5 @@
-import SideNavBar from "../../components/dashboard/side-navbar/side-navbar";
-import OrdersContent from "../../components/orders/ordersPage";
+import SideNavBar from "../../../../components/dashboard/side-navbar/side-navbar";
+import OrdersContent from "../../../../components/dashboard/orders/ordersPage";
 
 export default function OrdersPage() {
   return (

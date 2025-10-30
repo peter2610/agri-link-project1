@@ -1,4 +1,4 @@
-import DashboardHome from "./dashboard-pages/dashboard-home"
+import DashboardHome from "./dashboard-home"
 
 export default function DashboardContent() {
     return (

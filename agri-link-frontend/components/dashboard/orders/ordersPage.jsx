@@ -6,6 +6,7 @@ import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
+import DashboardHeader from "../header/dashboard-header";
 
 const ACTIVE = "active";
 const INACTIVE = "inactive";
@@ -159,27 +160,14 @@ export default function OrdersPage() {
 
 
   return (
-    <div className="flex-1 min-h-screen bg-[#FAFAFA] px-4 sm:px-8 lg:px-12 py-10 text-[#0C5B0D]">
-      <main className="flex flex-col gap-10">
+    <div className="flex-1 min-h-screen bg-[#FAFAFA] px-20 text-[#0C5B0D]">
+      <main className="flex flex-col">
         {/* Header */}
-        <header className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold leading-tight">Orders</h1>
-            <p className="mt-1 text-lg text-[#0C5B0D]/80">
-              View current Active and Inactive Orders
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
-              <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
-            </div>
-            <p className="text-base font-medium text-gray-700">Welcome, {userName.split(" ")[0]}</p>
-          </div>
-        </header>
+        <DashboardHeader title={"Orders"} subtitle={"View current Active and Inactive Orders"} />
+        262cf45 (Added AI chat):agri-link-frontend/components/dashboard/orders/ordersPage.jsx
 
         {/* Orders Section */}
-        <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+        <section className="w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6 mt-6">
           <div className="flex-1">
             {/* Tabs */}
             <div className="mb-5 flex flex-wrap items-center gap-4 text-lg font-medium">
