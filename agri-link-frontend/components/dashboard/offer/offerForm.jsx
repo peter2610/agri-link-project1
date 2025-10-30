@@ -17,10 +17,7 @@ export default function OfferForm() {
     postHarvest: "",
   });
   const [loading, setLoading] = useState(false);
-<<<<<<< HEAD
-=======
   const baseUrl = process.env.NEXT_PUBLIC_API || "http://127.0.0.1:5555";
->>>>>>> 262cf45 (Added AI chat)
 
   const handleChange = (e) => {
     const { name, value } = e.target;

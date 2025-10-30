@@ -2,12 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { UserRound } from "lucide-react";
-=======
 import { fetchJson } from "@/lib/api";
 import DashboardHeader from "../header/dashboard-header";
->>>>>>> 262cf45 (Added AI chat)
 
 const DEFAULT_FARMER_ID = 1;
 
@@ -72,7 +68,7 @@ export default function DashboardHome() {
         const parsed = JSON.parse(raw);
         if (parsed?.full_name) setUserName(parsed.full_name);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     return () => {
       ignore = true;

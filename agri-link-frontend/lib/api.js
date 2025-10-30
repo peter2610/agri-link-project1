@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-const DEFAULT_BASE_URL = "https://agri-link-project-10.onrender.com";
-=======
 const DEFAULT_BASE_URL = process.env.NEXT_PUBLIC_API || "http://localhost:5555";
->>>>>>> 262cf45 (Added AI chat)
 
 const buildUrl = (pathOrUrl) => {
   if (!pathOrUrl) {

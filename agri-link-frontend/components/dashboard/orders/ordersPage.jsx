@@ -1,15 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
-<<<<<<< HEAD:agri-link-frontend/components/orders/ordersPage.jsx
-import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
-=======
 import DashboardHeader from "../header/dashboard-header";
->>>>>>> 262cf45 (Added AI chat):agri-link-frontend/components/dashboard/orders/ordersPage.jsx
 
 const ACTIVE = "active";
 const INACTIVE = "inactive";
@@ -43,7 +36,6 @@ const formatNumber = (value, options) => {
 };
 
 export default function OrdersPage() {
-  const router = useRouter();
   const [status, setStatus] = useState(ACTIVE);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -94,7 +86,7 @@ export default function OrdersPage() {
         const parsed = JSON.parse(raw);
         if (parsed?.full_name) setUserName(parsed.full_name);
       }
-    } catch (_) {}
+    } catch (_) { }
   }, []);
 
   const handleCollaborate = async (order) => {
@@ -144,25 +136,7 @@ export default function OrdersPage() {
     <div className="flex-1 min-h-screen bg-[#FAFAFA] px-20 text-[#0C5B0D]">
       <main className="flex flex-col">
         {/* Header */}
-<<<<<<< HEAD:agri-link-frontend/components/orders/ordersPage.jsx
-        <header className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold leading-tight">Orders</h1>
-            <p className="mt-1 text-lg text-[#0C5B0D]/80">
-              View current Active and Inactive Orders
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
-              <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
-            </div>
-            <p className="text-base font-medium text-gray-700">Welcome, {userName.split(" ")[0]}</p>
-          </div>
-        </header>
-=======
         <DashboardHeader title={"Orders"} subtitle={"View current Active and Inactive Orders"} />
->>>>>>> 262cf45 (Added AI chat):agri-link-frontend/components/dashboard/orders/ordersPage.jsx
 
         {/* Orders Section */}
         <section className="w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6 mt-6">
