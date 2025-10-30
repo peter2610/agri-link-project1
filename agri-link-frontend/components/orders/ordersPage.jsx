@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
-import useCurrentFarmer from "@/lib/useCurrentFarmer";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const ACTIVE = "active";
 const INACTIVE = "inactive";
@@ -38,12 +39,12 @@ const formatNumber = (value, options) => {
 };
 
 export default function OrdersPage() {
+  const router = useRouter();
   const [status, setStatus] = useState(ACTIVE);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const currentFarmer = useCurrentFarmer();
-  const displayName = currentFarmer?.full_name?.split(" ")[0] ?? "User";
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
     let ignore = false;
@@ -53,12 +54,15 @@ export default function OrdersPage() {
       setError(null);
 
       try {
-        const statusParam = STATUS_QUERY_MAP[status];
-        const query = statusParam ? `?status=${statusParam}` : "";
-        const data = await fetchJson(`/orders${query}`);
+        // Backend offers API: align with OfferForm which uses GET/POST /offer
+        // Some backends may support filtering by status; if not, ignore.
+        // We fetch the list of offers directly.
+        const data = await fetchJson(`/offer`);
 
         if (!ignore) {
-          setOrders(data?.orders ?? []);
+          // Accept both array payloads and objects with orders property
+          const list = Array.isArray(data) ? data : (data?.orders ?? []);
+          setOrders(list);
         }
       } catch (fetchError) {
         if (!ignore) {
@@ -79,11 +83,64 @@ export default function OrdersPage() {
     };
   }, [status]);
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
+  }, []);
+
+  const handleCollaborate = async (order) => {
+    try {
+      const crop_name = order.crop_name ?? order.crop;
+      const price = order.price_per_kg ?? order.price;
+      const weight_demand = order.quantity;
+      const location = order.location;
+
+      if (!crop_name || !price || !weight_demand || !location) {
+        return toast.error("Missing required fields for collaboration");
+      }
+
+      const payload = {
+        location,
+        crops: [
+          {
+            crop_name,
+            price,
+            weight_demand,
+          },
+        ],
+        source_order_id: order.id,
+      };
+
+      const res = await fetch(`/api/collaborations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const msg = errJson?.message || errJson?.error || `Failed to create collaboration (${res.status})`;
+        return toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
+      }
+      toast.success("Collaboration created");
+      router.push("/collaboration");
+    } catch (e) {
+      const msg = e?.message || "Failed to create collaboration";
+      toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
+  };
+
+
+
   return (
     <div className="flex-1 min-h-screen bg-[#FAFAFA] px-4 sm:px-8 lg:px-12 py-10 text-[#0C5B0D]">
       <main className="flex flex-col gap-10">
         {/* Header */}
-        <header className="mx-auto flex w-full max-w-[1024px] flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <header className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold leading-tight">Orders</h1>
             <p className="mt-1 text-lg text-[#0C5B0D]/80">
@@ -95,29 +152,27 @@ export default function OrdersPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
               <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
             </div>
-            <p className="text-base font-medium text-gray-700">Welcome, {displayName}</p>
+            <p className="text-base font-medium text-gray-700">Welcome, {userName.split(" ")[0]}</p>
           </div>
         </header>
 
         {/* Orders Section */}
-        <section className="mx-auto w-full max-w-[1024px] rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+        <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
           <div className="flex-1">
             {/* Tabs */}
             <div className="mb-5 flex flex-wrap items-center gap-4 text-lg font-medium">
               <button
                 onClick={() => setStatus(ACTIVE)}
-                className={`transition-colors ${
-                  status === ACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
-                }`}
+                className={`transition-colors ${status === ACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
+                  }`}
               >
                 Active
               </button>
-              <span className="hidden h-6 w-[2px] bg-[#0C5B0D]/50 sm:inline" aria-hidden="true" />
+              <span className="hidden h-6 w-0.5 bg-[#0C5B0D]/50 sm:inline" aria-hidden="true" />
               <button
                 onClick={() => setStatus(INACTIVE)}
-                className={`transition-colors ${
-                  status === INACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
-                }`}
+                className={`transition-colors ${status === INACTIVE ? "font-extrabold text-[#0C5B0D]" : "text-[#0C5B0D]/60"
+                  }`}
               >
                 Inactive
               </button>
@@ -127,7 +182,7 @@ export default function OrdersPage() {
             </div>
 
             {/* Table */}
-            <div className="overflow-hidden rounded-[16px] bg-white shadow">
+            <div className="overflow-hidden rounded-2xl bg-white shadow">
               {/* Table Header */}
               <div className="grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 border-b border-[#E4E4E4] px-5 py-3 text-sm font-semibold text-[#0C5B0D] sm:text-base">
                 <span>#</span>
@@ -159,31 +214,30 @@ export default function OrdersPage() {
 
                 {!loading && !error && orders.map((order, index) => {
                   const buttonColor = collaborateColors[index % collaborateColors.length];
-                  const priceDisplay = formatNumber(order.price_per_kg, {
+                  const priceDisplay = formatNumber(order.price_per_kg ?? order.price, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   });
 
                   return (
                     <div
-                      key={`${status}-${order.id}`}
-                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${
-                        index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
-                      }`}
+                      key={`${status}-${order.id ?? index}`}
+                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
+                        }`}
                     >
-                      <span className="font-medium text-[#0C5B0D]">{order.id}</span>
-                      <span>{order.crop_name ?? "—"}</span>
+                      <span className="font-medium text-[#0C5B0D]">{order.id ?? index + 1}</span>
+                      <span>{order.crop_name ?? order.crop ?? "—"}</span>
                       <span>{formatNumber(order.quantity)}</span>
                       <span>{priceDisplay}</span>
                       <span>{order.location ?? "—"}</span>
                       <span className="flex justify-end">
-                        <Link
-                          href="#"
+                        <button
+                          onClick={() => handleCollaborate(order)}
                           className="rounded-[9px] px-3 py-2 text-sm font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5 sm:text-base"
                           style={{ backgroundColor: buttonColor }}
                         >
                           Collaborate
-                        </Link>
+                        </button>
                       </span>
                     </div>
                   );

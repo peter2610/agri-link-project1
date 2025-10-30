@@ -1,7 +1,7 @@
 from datetime import datetime
 from config import db
 from sqlalchemy import Enum
-from models.farmer import Farmer  # ✅ Import the real Farmer model
+# from models.farmer import Farmer  # ✅ Import the real Farmer model
 
 CROP_CATEGORIES = ('Cereals', 'Vegetables', 'Fruits', 'Export Crop', 'Other')
 

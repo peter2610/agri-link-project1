@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation";
+import { API } from "@/utils/api";
 
 export default function SignupBuyerForm() {
     const router = useRouter()
@@ -12,7 +13,6 @@ export default function SignupBuyerForm() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const emailTemplate = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const minPasswordLength = 10;
-    const API = "http://localhost:5555"
 
     const handleSignUp = async (e) => {
         e.preventDefault()

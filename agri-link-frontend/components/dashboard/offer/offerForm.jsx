@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { fetchJson } from "@/lib/api";
 
 export default function OfferForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     cropName: "",
     category: "",
@@ -14,7 +17,6 @@ export default function OfferForm() {
     postHarvest: "",
   });
   const [loading, setLoading] = useState(false);
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,34 +46,37 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await fetch(`${baseUrl}/offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          crop_name: cropName,
-          category,
-          quantity: weight,
-          price,
-          location,
-          post_harvest_period: postHarvest,
-        }),
-      });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        const errMsg = errJson?.message || errJson?.error || `Failed to create offer (${res.status})`;
-        return toast.error(errMsg);
+      const body = {
+        crop_name: cropName,
+        category,
+        quantity: weight,
+        price,
+        location,
+        post_harvest_period: postHarvest,
+      };
+      // Optional dev fallback: include farmer_id from env to avoid third-party cookie issues on localhost
+      const fallbackFarmerId = process.env.NEXT_PUBLIC_FALLBACK_FARMER_ID
+        ? Number(process.env.NEXT_PUBLIC_FALLBACK_FARMER_ID)
+        : NaN;
+      if (Number.isFinite(fallbackFarmerId) && fallbackFarmerId > 0) {
+        body.farmer_id = fallbackFarmerId;
       }
 
-      const data = await res.json();
+      const data = await fetchJson(`/offer`, {
+        method: "POST",
+        body,
+      });
       toast.success(data?.message || "Offer created successfully");
 
-      if (action === "create-new") {
-        setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
+      setForm({ cropName: "", category: "", price: "", weight: "", location: "", postHarvest: "" });
+
+      if (action === "create") {
+        toast.success("Redirecting to Orders…");
+        router.push("/orders");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Network error creating offer");
+      toast.error(err?.message || "Network error creating offer");
     } finally {
       setLoading(false);
     }
@@ -81,18 +86,12 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await fetch(`${baseUrl}/offer`, { method: "GET" });
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        const errMsg = errJson?.message || errJson?.error || `Failed to fetch offers (${res.status})`;
-        return toast.error(errMsg);
-      }
-      const list = await res.json();
+      const list = await fetchJson(`/offer`, { method: "GET" });
       console.log("Created offers:", list);
       toast.success(`Fetched ${Array.isArray(list) ? list.length : 0} offers`);
     } catch (err) {
       console.error(err);
-      toast.error("Network error fetching offers");
+      toast.error(err?.message || "Network error fetching offers");
     } finally {
       setLoading(false);
     }
@@ -104,101 +103,101 @@ export default function OfferForm() {
   const label = "block mb-2 font-semibold text-green-900";
 
   return (
-    <div>
+    <div className="sm:px-8 lg:px-12 py-10">
       <form id="offer-form" onSubmit={handleSubmit} className="bg-[#F4F7F4] rounded-3xl p-6" aria-busy={loading}>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className={label}>Crop Name:</label>
-              <input
-                className={inputBase}
-                name="cropName"
-                type="text"
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className={label}>Crop Name:</label>
+            <input
+              className={inputBase}
+              name="cropName"
+              type="text"
+              required
+              value={form.cropName}
+              onChange={handleChange}
+              placeholder="Insert Name"
+            />
+          </div>
+          <div>
+            <label className={label}>Crop Category:</label>
+            <div className="relative">
+              <select
+                className={`${inputBase} appearance-none pr-10`}
+                name="category"
                 required
-                value={form.cropName}
+                value={form.category}
                 onChange={handleChange}
-                placeholder="Insert Name"
-              />
-            </div>
-            <div>
-              <label className={label}>Crop Category:</label>
-              <div className="relative">
-                <select
-                  className={`${inputBase} appearance-none pr-10`}
-                  name="category"
-                  required
-                  value={form.category}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Category</option>
-                  <option>Cereals</option>
-                  <option>Vegetables</option>
-                  <option>Fruits</option>
-                  <option>Export Crop</option>
-                  <option>Other</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-green-900" size={18} />
-              </div>
-            </div>
-            <div>
-              <label className={label}>Price:</label>
-              <input
-                className={inputBase}
-                name="price"
-                type="number"
-                inputMode="decimal"
-                min="0.01"
-                step="0.01"
-                required
-                value={form.price}
-                onChange={handleChange}
-                placeholder="KSH 0.00"
-              />
-            </div>
-            <div>
-              <label className={label}>Weight:</label>
-              <input
-                className={inputBase}
-                name="weight"
-                type="number"
-                inputMode="decimal"
-                min="0.01"
-                step="0.01"
-                required
-                value={form.weight}
-                onChange={handleChange}
-                placeholder="0.00 KG"
-              />
-            </div>
-            <div>
-              <label className={label}>Location:</label>
-              <input
-                className={inputBase}
-                name="location"
-                type="text"
-                required
-                value={form.location}
-                onChange={handleChange}
-                placeholder="Add Location"
-              />
-            </div>
-            <div>
-              <label className={label}>Post Harvest Period:</label>
-              <input
-                className={inputBase}
-                name="postHarvest"
-                type="number"
-                inputMode="numeric"
-                min="0"
-                step="1"
-                required
-                value={form.postHarvest}
-                onChange={handleChange}
-                placeholder="0 Months"
-              />
+              >
+                <option value="">Select Category</option>
+                <option>Cereals</option>
+                <option>Vegetables</option>
+                <option>Fruits</option>
+                <option>Export Crop</option>
+                <option>Other</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-green-900" size={18} />
             </div>
           </div>
+          <div>
+            <label className={label}>Price:</label>
+            <input
+              className={inputBase}
+              name="price"
+              type="number"
+              inputMode="decimal"
+              min="0.01"
+              step="0.01"
+              required
+              value={form.price}
+              onChange={handleChange}
+              placeholder="KSH 0.00"
+            />
+          </div>
+          <div>
+            <label className={label}>Weight:</label>
+            <input
+              className={inputBase}
+              name="weight"
+              type="number"
+              inputMode="decimal"
+              min="0.01"
+              step="0.01"
+              required
+              value={form.weight}
+              onChange={handleChange}
+              placeholder="0.00 KG"
+            />
+          </div>
+          <div>
+            <label className={label}>Location:</label>
+            <input
+              className={inputBase}
+              name="location"
+              type="text"
+              required
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Add Location"
+            />
+          </div>
+          <div>
+            <label className={label}>Post Harvest Period:</label>
+            <input
+              className={inputBase}
+              name="postHarvest"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              required
+              value={form.postHarvest}
+              onChange={handleChange}
+              placeholder="0 Months"
+            />
+          </div>
+        </div>
       </form>
-      
+
     </div>
   );
 }

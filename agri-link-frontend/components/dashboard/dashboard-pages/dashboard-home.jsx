@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
-import { fetchJson } from "@/lib/api";
-import useCurrentFarmer from "@/lib/useCurrentFarmer";
 
 const DEFAULT_FARMER_ID = 1;
 
@@ -21,12 +19,18 @@ const formatNumber = (value, options) => {
   return numeric.toLocaleString(undefined, options);
 };
 
+const formatCompact = (value) => {
+  if (value === null || value === undefined) return "—";
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return String(value);
+  return new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(numeric);
+};
+
 export default function DashboardHome() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const currentFarmer = useCurrentFarmer();
-  const farmerId = currentFarmer?.id ?? DEFAULT_FARMER_ID;
+  const [userName, setUserName] = useState("User");
 
   useEffect(() => {
     let ignore = false;
@@ -36,8 +40,9 @@ export default function DashboardHome() {
       setError(null);
 
       try {
-        const query = farmerId ? `?farmer_id=${farmerId}` : "";
-        const data = await fetchJson(`/dashboard${query}`);
+        const res = await fetch(`/api/farmer/dashboard?farmer_id=${DEFAULT_FARMER_ID}`, { credentials: "include" });
+        if (!res.ok) throw new Error(`Failed to load dashboard (${res.status})`);
+        const data = await res.json();
         if (!ignore) {
           setDashboard(data);
         }
@@ -55,21 +60,27 @@ export default function DashboardHome() {
 
     loadDashboard();
 
+    // Load logged-in name from localStorage (client only)
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
+
     return () => {
       ignore = true;
     };
   }, [farmerId]);
 
-  const farmerName = currentFarmer?.full_name ?? dashboard?.farmer?.full_name ?? "User";
+  const farmerName = (dashboard?.farmer?.full_name ?? userName) || "User";
   const summaryStats = [
     { title: "Orders Completed", value: formatNumber(dashboard?.completed_orders) },
     { title: "Pending Orders", value: formatNumber(dashboard?.pending_orders) },
     {
       title: "Total Earnings (KSH)",
-      value: formatNumber(dashboard?.total_revenue_value, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+      value: formatCompact(dashboard?.total_revenue_value),
     },
     {
       title: "Total Crops Sold (KG)",
@@ -83,9 +94,9 @@ export default function DashboardHome() {
   const recentOrders = dashboard?.recent_orders ?? [];
 
   return (
-    <main className="flex min-h-screen flex-col gap-10 bg-[#FAFAFA] pb-16">
+    <main className="flex min-h-screen flex-col gap-10">
       {/* Header */}
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 sm:flex-row items-center justify-between">
         <div>
           <p className="text-3xl font-semibold leading-tight text-[#0C5B0D]">
             Farmer’s Dashboard
@@ -103,7 +114,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick Summary Section */}
-      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-6 shadow-sm">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Quick Summary

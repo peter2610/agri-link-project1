@@ -8,9 +8,18 @@ export default function ContributionForm({ orderId, crops = [], onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const cropId = crops[0]?.id;
-    const farmerName = "User";
-    if (!cropId) return toast.error("No crop available to contribute to");
+    if (!Array.isArray(crops) || crops.length === 0) {
+      return toast.error("No crop available to contribute to");
+    }
+    const cropId = crops[0]?.id ?? 1;
+    let farmerName = "User";
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) farmerName = parsed.full_name;
+      }
+    } catch (_) {}
     if (!weight || weight <= 0) return toast.error("Enter a valid weight greater than 0");
     onSubmit({ farmerName, cropId, weight });
     setWeight("");

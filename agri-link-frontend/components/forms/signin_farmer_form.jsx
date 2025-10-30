@@ -3,11 +3,10 @@
 import Link from "next/link"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation";
-import { setStoredFarmer } from "@/lib/useCurrentFarmer";
+import { API } from "@/utils/api";
 
 export default function SigninFarmerForm() {
     const router = useRouter()
-    const API = "http://localhost:5555"
 
     const handleSignIn = async (e) => {
         e.preventDefault()
@@ -27,7 +26,10 @@ export default function SigninFarmerForm() {
             if (response.ok) {
                 setStoredFarmer(data)
                 toast.success(`Welcome back, ${data.full_name.split(" ")[0]}!`)
-                router.push('/dashboard')
+                try {
+                    window.localStorage.setItem('agri_user', JSON.stringify({ full_name: data.full_name, role: 'farmer' }))
+                } catch (_) { }
+                router.push('/farmer/dashboard')
             } else {
                 toast.error(`${data.error}`)
             }

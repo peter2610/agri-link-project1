@@ -13,17 +13,33 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function CollaborationHub() {
   const [orders, setOrders] = useState([]);
+  const [userName, setUserName] = useState("User");
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:5555";
+  const toPrice = (val) => {
+    if (val == null) return "-";
+    if (typeof val === "number") return val;
+    if (typeof val === "string") {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : val;
+    }
+    // Handle object shapes like { amount }
+    if (typeof val === "object") {
+      if (typeof val.amount === "number") return val.amount;
+      if (typeof val.value === "number") return val.value;
+      return JSON.stringify(val);
+    }
+    return String(val);
+  };
 
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const res = await fetch(`${baseUrl}/collaborations`);
-        if (!res.ok) throw new Error(`Failed to fetch collaborations (${res.status})`);
+        const res = await fetch(`/api/collaborations`, { method: "GET" });
+        if (!res.ok) throw new Error(`Failed to load collaborations (${res.status})`);
         const data = await res.json();
         // Map backend collaborations to UI rows
         const mapped = (Array.isArray(data) ? data : []).map((c) => {
@@ -34,7 +50,7 @@ export default function CollaborationHub() {
           return {
             id: c.id,
             crop: first?.crop_name || "-",
-            price: first?.price ?? "-",
+            price: toPrice(first?.price ?? first?.price_per_kg),
             location: c.location,
             quantity: weightDemand,
             progress,
@@ -42,10 +58,20 @@ export default function CollaborationHub() {
         });
         setOrders(mapped);
       } catch (err) {
-        console.error("Error fetching orders:", err);
+        console.error("Error fetching collaborations:", err);
+        toast.error(err?.message || "Failed to load collaborations");
       }
     }
     fetchOrders();
+
+    // load logged-in name
+    try {
+      const raw = window.localStorage.getItem("agri_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.full_name) setUserName(parsed.full_name);
+      }
+    } catch (_) {}
   }, []);
 
   const handleJoinCollaboration = (orderId) => {
@@ -63,7 +89,7 @@ export default function CollaborationHub() {
             <p className="text-gray-600 -mt-1">Collaborate with other farmers on orders</p>
           </div>
           <div className="flex items-center gap-3 text-green-900">
-            <span>Welcome, <span className="font-semibold">User</span></span>
+            <span>Welcome, <span className="font-semibold">{userName.split(" ")[0]}</span></span>
             <div className="h-9 w-9 rounded-full border-2 border-green-700 grid place-items-center">
               <UserRound size={18} />
             </div>
