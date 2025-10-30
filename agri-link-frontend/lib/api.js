@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = "http://localhost:5555";
+const DEFAULT_BASE_URL = "https://agri-link-project-10.onrender.com";
 
 const buildUrl = (pathOrUrl) => {
   if (!pathOrUrl) {
@@ -51,7 +51,7 @@ export async function fetchJson(pathOrUrl, options) {
   const payload = await parseBody();
 
   if (!response.ok) {
-    const errorMessage = payload?.error || payload?.message || response.statusText;
+    const errorMessage = payload?.error || payload?.message || payload?.details || response.statusText;
     const error = new Error(errorMessage || "Request failed");
     error.status = response.status;
     error.body = payload;

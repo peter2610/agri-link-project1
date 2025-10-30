@@ -1,1 +1,1 @@
-export const API = process.env.NEXT_PUBLIC_API || 'http://localhost:5555'
+export const API = process.env.NEXT_PUBLIC_API || 'https://agri-link-project-10.onrender.com'
