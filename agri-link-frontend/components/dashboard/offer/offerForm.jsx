@@ -17,10 +17,6 @@ export default function OfferForm() {
     postHarvest: "",
   });
   const [loading, setLoading] = useState(false);
-<<<<<<< HEAD
-=======
-  const baseUrl = process.env.NEXT_PUBLIC_API || "http://127.0.0.1:5555";
->>>>>>> 262cf45 (Added AI chat)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,7 +67,7 @@ export default function OfferForm() {
         headers["X-Farmer-Id"] = String(fallbackFarmerId);
       }
 
-      const data = await fetchJson(`/offer`, {
+      const data = await fetchJson(`/offers`, {
         method: "POST",
         headers,
         body,
@@ -82,7 +78,7 @@ export default function OfferForm() {
 
       if (action === "create") {
         toast.success("Redirecting to Orders…");
-        router.push("/orders?created=1");
+        router.push("/farmer/dashboard/orders?created=1");
       }
     } catch (err) {
       console.error(err);
@@ -96,7 +92,7 @@ export default function OfferForm() {
     if (loading) return;
     try {
       setLoading(true);
-      const list = await fetchJson(`/offer`, { method: "GET" });
+      const list = await fetchJson(`/offers`, { method: "GET" });
       console.log("Created offers:", list);
       toast.success(`Fetched ${Array.isArray(list) ? list.length : 0} offers`);
     } catch (err) {

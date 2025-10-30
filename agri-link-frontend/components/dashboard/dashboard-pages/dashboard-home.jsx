@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { UserRound } from "lucide-react";
-=======
-import { fetchJson } from "@/lib/api";
 import DashboardHeader from "../header/dashboard-header";
->>>>>>> 262cf45 (Added AI chat)
 
 const DEFAULT_FARMER_ID = 1;
 

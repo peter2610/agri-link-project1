@@ -20,11 +20,7 @@ export default function SideNavBar() {
         </Link>
       </div>
       <div className="flex flex-col items-start gap-4 text-green-800 w-full">
-<<<<<<< HEAD
-        <Link href="/farmer/dashboard" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
-=======
         <Link href="/farmer/dashboard/home" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/home") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
->>>>>>> 262cf45 (Added AI chat)
           <BiHome /> Home
         </Link>
         <Link href="/farmer/dashboard/orders" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/orders") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
@@ -42,11 +38,7 @@ export default function SideNavBar() {
         >
           <BiGroup /> Collaborations
         </Link>
-<<<<<<< HEAD
-        <Link href="/assistant" className={`${itemBase} ${pathname?.startsWith("/assistant") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
-=======
         <Link href="/farmer/dashboard/assistant" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/assistant") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
->>>>>>> 262cf45 (Added AI chat)
           <BiChat /> AI Assistant
         </Link>
       </div>

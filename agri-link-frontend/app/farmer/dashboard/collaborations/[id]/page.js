@@ -14,11 +14,8 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
-<<<<<<< HEAD:agri-link-frontend/app/collaboration/[id]/page.js
 import { toast } from "react-hot-toast";
-=======
 import DashboardHeader from "@/components/dashboard/header/dashboard-header";
->>>>>>> 262cf45 (Added AI chat):agri-link-frontend/app/farmer/dashboard/collaborations/[id]/page.js
 
 export default function CollaborationDetails() {
   const { id } = useParams();
@@ -53,7 +50,7 @@ export default function CollaborationDetails() {
       // Refresh details with updated crops
       setOrder((prev) => (prev ? { ...prev, crops: updated.crops ?? prev.crops } : prev));
       toast.success("Contribution added");
-      router.push("/collaboration");
+      router.push("/farmer/dashboard/collaborations");
     } catch (err) {
       console.error("Error adding collaboration:", err);
       toast.error(err?.message || "Failed to add contribution");

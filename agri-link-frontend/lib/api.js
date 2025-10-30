@@ -1,8 +1,7 @@
-<<<<<<< HEAD
-const DEFAULT_BASE_URL = "https://agri-link-project-10.onrender.com";
-=======
-const DEFAULT_BASE_URL = process.env.NEXT_PUBLIC_API || "http://localhost:5555";
->>>>>>> 262cf45 (Added AI chat)
+const DEFAULT_BASE_URL =
+  (process.env.NEXT_PUBLIC_API && process.env.NEXT_PUBLIC_API.trim()) ||
+  (process.env.NEXT_PUBLIC_API_BASE_URL && process.env.NEXT_PUBLIC_API_BASE_URL.trim()) ||
+  "http://localhost:5555";
 
 const buildUrl = (pathOrUrl) => {
   if (!pathOrUrl) {
@@ -13,7 +12,7 @@ const buildUrl = (pathOrUrl) => {
     return pathOrUrl;
   }
 
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || DEFAULT_BASE_URL;
+  const base = DEFAULT_BASE_URL;
   return `${base}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`;
 };
 
