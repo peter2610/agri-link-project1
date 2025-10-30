@@ -21,12 +21,10 @@ from routes.collaboration_route import (
 from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
 from routes.mailing_list_route import AddToMailingList, GetMailingList
-<<<<<<< HEAD
 from routes.seed_offers_route import SeedOffersResource
-=======
 from routes.ai_chat_route import AiChat
 from routes.signin_farmer_route import CheckSessionFarmer
->>>>>>> 883d071049b1dc5b681c8f20b827e0dc9164c01e
+
 
 
 # ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
@@ -145,13 +143,10 @@ api.add_resource(OrderStatisticsResource, '/orders/statistics')
 
 api.add_resource(AddToMailingList, '/join_mailinglist')
 api.add_resource(GetMailingList, '/mailinglist')
-<<<<<<< HEAD
 api.add_resource(SeedOffersResource, '/seed_offers')
-=======
 api.add_resource(AiChat, "/ai/chat")
 api.add_resource(CheckSessionFarmer, "/farmer/check_session")
 # api.add_resource(CheckSessionBuyer, "/buyer/check_session")
->>>>>>> 883d071049b1dc5b681c8f20b827e0dc9164c01e
 
 # ✅ Run Server
 if __name__ == '__main__':
