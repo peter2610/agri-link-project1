@@ -18,6 +18,14 @@ class Crop(db.Model):
     # Relationships
     offers = db.relationship('Offer', backref='crop', lazy=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "category": self.category,
+            "farmer_id": self.farmer_id,
+        }
+
 
 class Offer(db.Model):
     __tablename__ = 'offers'
@@ -31,3 +39,16 @@ class Offer(db.Model):
     post_harvest_period = db.Column(db.Integer, default=0)
     status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "farmer_id": self.farmer_id,
+            "crop_id": self.crop_id,
+            "quantity": self.quantity,
+            "price": self.price,
+            "location": self.location,
+            "post_harvest_period": self.post_harvest_period,
+            "status": self.status,
+        }

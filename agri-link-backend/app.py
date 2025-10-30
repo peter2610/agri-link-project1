@@ -21,6 +21,7 @@ from routes.collaboration_route import (
 from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
 from routes.mailing_list_route import AddToMailingList, GetMailingList
+from routes.ai_chat_route import AiChat
 
 
 # ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
@@ -121,7 +122,7 @@ api.add_resource(SignupFarmer, '/farmers/signup', endpoint='signup_farmers')
 api.add_resource(SigninFarmer, '/farmers/signin', endpoint='signin_farmers')
 api.add_resource(SignupBuyer, '/buyers/signup', endpoint='signup_buyers')
 api.add_resource(SigninBuyer, '/buyers/signin', endpoint='signin_buyers')
-api.add_resource(OfferResource, '/offer', endpoint='offer')
+api.add_resource(OfferResource, '/offers', endpoint='offer')
 api.add_resource(CollaborationListResource, '/collaborations', endpoint='collaboration_list')
 api.add_resource(CollaborationDetailResource, '/collaborations/<int:collaboration_id>', endpoint='collaboration_detail')
 api.add_resource(ContributionResource, '/collaborations/<int:collaboration_id>/contributions', endpoint='contribution')
@@ -139,6 +140,7 @@ api.add_resource(OrderStatisticsResource, '/orders/statistics')
 
 api.add_resource(AddToMailingList, '/join_mailinglist')
 api.add_resource(GetMailingList, '/mailinglist')
+api.add_resource(AiChat, "/ai/chat")
 
 # ✅ Run Server
 if __name__ == '__main__':

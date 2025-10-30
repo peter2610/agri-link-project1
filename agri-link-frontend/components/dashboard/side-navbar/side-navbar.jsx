@@ -20,25 +20,33 @@ export default function SideNavBar() {
         </Link>
       </div>
       <div className="flex flex-col items-start gap-4 text-green-800 w-full">
+<<<<<<< HEAD
         <Link href="/farmer/dashboard" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+=======
+        <Link href="/farmer/dashboard/home" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/home") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+>>>>>>> 262cf45 (Added AI chat)
           <BiHome /> Home
         </Link>
-        <Link href="/orders" className={`${itemBase} ${pathname?.startsWith("/orders") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+        <Link href="/farmer/dashboard/orders" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/orders") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
           <BiShoppingBag /> View Orders
         </Link>
         <Link
-          href="/offer"
-          className={`${itemBase} ${pathname?.startsWith("/offer") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}
+          href="/farmer/dashboard/offers"
+          className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/offers") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}
         >
           <BiPlusCircle /> Make An Offer
         </Link>
         <Link
-          href="/collaboration"
-          className={`${itemBase} ${pathname?.startsWith("/collaboration") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}
+          href="/farmer/dashboard/collaborations"
+          className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/collaborations") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}
         >
           <BiGroup /> Collaborations
         </Link>
+<<<<<<< HEAD
         <Link href="/assistant" className={`${itemBase} ${pathname?.startsWith("/assistant") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+=======
+        <Link href="/farmer/dashboard/assistant" className={`${itemBase} ${pathname?.startsWith("/farmer/dashboard/assistant") ? "bg-[#CFF56A] text-green-900" : "text-green-800"}`}>
+>>>>>>> 262cf45 (Added AI chat)
           <BiChat /> AI Assistant
         </Link>
       </div>

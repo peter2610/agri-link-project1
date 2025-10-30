@@ -1,5 +1,5 @@
-import SideNavBar from "../../../components/dashboard/side-navbar/side-navbar";
-import DashboardContent from "../../../components/dashboard/dashboard-content";
+import SideNavBar from "../../../../components/dashboard/side-navbar/side-navbar";
+import DashboardContent from "../../../../components/dashboard/dashboard-pages/dashboard-content";
 
 export default function Dashboard() {
     return (

@@ -17,6 +17,10 @@ export default function OfferForm() {
     postHarvest: "",
   });
   const [loading, setLoading] = useState(false);
+<<<<<<< HEAD
+=======
+  const baseUrl = process.env.NEXT_PUBLIC_API || "http://127.0.0.1:5555";
+>>>>>>> 262cf45 (Added AI chat)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,98 +107,118 @@ export default function OfferForm() {
   const label = "block mb-2 font-semibold text-green-900";
 
   return (
-    <div className="sm:px-8 lg:px-12 py-10">
+    <div className="py-10">
       <form id="offer-form" onSubmit={handleSubmit} className="bg-[#F4F7F4] rounded-3xl p-6" aria-busy={loading}>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className={label}>Crop Name:</label>
-            <input
-              className={inputBase}
-              name="cropName"
-              type="text"
-              required
-              value={form.cropName}
-              onChange={handleChange}
-              placeholder="Insert Name"
-            />
-          </div>
-          <div>
-            <label className={label}>Crop Category:</label>
-            <div className="relative">
-              <select
-                className={`${inputBase} appearance-none pr-10`}
-                name="category"
+        <div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className={label}>Crop Name:</label>
+              <input
+                className={inputBase}
+                name="cropName"
+                type="text"
                 required
-                value={form.category}
+                value={form.cropName}
                 onChange={handleChange}
-              >
-                <option value="">Select Category</option>
-                <option>Cereals</option>
-                <option>Vegetables</option>
-                <option>Fruits</option>
-                <option>Export Crop</option>
-                <option>Other</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-green-900" size={18} />
+                placeholder="Insert Name"
+              />
+            </div>
+            <div>
+              <label className={label}>Crop Category:</label>
+              <div className="relative">
+                <select
+                  className={`${inputBase} appearance-none pr-10`}
+                  name="category"
+                  required
+                  value={form.category}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Category</option>
+                  <option>Cereals</option>
+                  <option>Vegetables</option>
+                  <option>Fruits</option>
+                  <option>Export Crop</option>
+                  <option>Other</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-green-900" size={18} />
+              </div>
+            </div>
+            <div>
+              <label className={label}>Price:</label>
+              <input
+                className={inputBase}
+                name="price"
+                type="number"
+                inputMode="decimal"
+                min="0.01"
+                step="0.01"
+                required
+                value={form.price}
+                onChange={handleChange}
+                placeholder="KSH 0.00"
+              />
+            </div>
+            <div>
+              <label className={label}>Weight:</label>
+              <input
+                className={inputBase}
+                name="weight"
+                type="number"
+                inputMode="decimal"
+                min="0.01"
+                step="0.01"
+                required
+                value={form.weight}
+                onChange={handleChange}
+                placeholder="0.00 KG"
+              />
+            </div>
+            <div>
+              <label className={label}>Location:</label>
+              <input
+                className={inputBase}
+                name="location"
+                type="text"
+                required
+                value={form.location}
+                onChange={handleChange}
+                placeholder="Add Location"
+              />
+            </div>
+            <div>
+              <label className={label}>Post Harvest Period:</label>
+              <input
+                className={inputBase}
+                name="postHarvest"
+                type="number"
+                inputMode="numeric"
+                min="0"
+                step="1"
+                required
+                value={form.postHarvest}
+                onChange={handleChange}
+                placeholder="0 Months"
+              />
             </div>
           </div>
-          <div>
-            <label className={label}>Price:</label>
-            <input
-              className={inputBase}
-              name="price"
-              type="number"
-              inputMode="decimal"
-              min="0.01"
-              step="0.01"
-              required
-              value={form.price}
-              onChange={handleChange}
-              placeholder="KSH 0.00"
-            />
-          </div>
-          <div>
-            <label className={label}>Weight:</label>
-            <input
-              className={inputBase}
-              name="weight"
-              type="number"
-              inputMode="decimal"
-              min="0.01"
-              step="0.01"
-              required
-              value={form.weight}
-              onChange={handleChange}
-              placeholder="0.00 KG"
-            />
-          </div>
-          <div>
-            <label className={label}>Location:</label>
-            <input
-              className={inputBase}
-              name="location"
-              type="text"
-              required
-              value={form.location}
-              onChange={handleChange}
-              placeholder="Add Location"
-            />
-          </div>
-          <div>
-            <label className={label}>Post Harvest Period:</label>
-            <input
-              className={inputBase}
-              name="postHarvest"
-              type="number"
-              inputMode="numeric"
-              min="0"
-              step="1"
-              required
-              value={form.postHarvest}
-              onChange={handleChange}
-              placeholder="0 Months"
-            />
-          </div>
+        </div>
+        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <button
+            form="offer-form"
+            type="submit"
+            data-action="create"
+            className="sm:flex-1 rounded-2xl bg-[#CFF56A] text-green-900 font-semibold px-6 py-4 hover:brightness-95"
+          >
+            Add Offer
+          </button>
+          <button
+            form="offer-form"
+            type="submit"
+            data-action="create-new"
+            className="sm:flex-1 rounded-2xl border-2 bg-green-800 border-green-800 text-neutral-50 font-semibold px-6 py-4 hover:bg-green-700"
+          >
+            Add & Create New Offer
+          </button>
         </div>
       </form>
 

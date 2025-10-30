@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import CollaborationCard from "../../components/dashboard/collaboration/CollaborationCard";
-import Sidebar from "../../components/dashboard/side-navbar/side-navbar";
+import CollaborationCard from "../../../../components/dashboard/collaboration/CollaborationCard";
+import Sidebar from "../../../../components/dashboard/side-navbar/side-navbar";
 import {
   Home,
   ClipboardList,
@@ -13,7 +13,11 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
+<<<<<<< HEAD:agri-link-frontend/app/collaboration/page.js
 import { toast } from "react-hot-toast";
+=======
+import DashboardHeader from "@/components/dashboard/header/dashboard-header";
+>>>>>>> 262cf45 (Added AI chat):agri-link-frontend/app/farmer/dashboard/collaborations/page.js
 
 export default function CollaborationHub() {
   const [orders, setOrders] = useState([]);
@@ -82,6 +86,7 @@ export default function CollaborationHub() {
     <div className="flex min-h-screen bg-[#ffffff]">
       <Sidebar />
 
+<<<<<<< HEAD:agri-link-frontend/app/collaboration/page.js
       <main className="flex-1 flex flex-col px-10 py-8">
         <div className="flex items-start justify-between mb-6">
           <div>
@@ -95,6 +100,10 @@ export default function CollaborationHub() {
             </div>
           </div>
         </div>
+=======
+      <main className="flex-1 flex flex-col px-20">
+        <DashboardHeader title="Collaboration Hub" subtitle="Collaborate with other farmers on orders" />
+>>>>>>> 262cf45 (Added AI chat):agri-link-frontend/app/farmer/dashboard/collaborations/page.js
 
         <div className="bg-[#F4F7F4] rounded-3xl p-6">
           <div className="flex items-center gap-3 px-2 md:px-4">

@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { UserRound } from "lucide-react";
+=======
+import { fetchJson } from "@/lib/api";
+import DashboardHeader from "../header/dashboard-header";
+>>>>>>> 262cf45 (Added AI chat)
 
 const DEFAULT_FARMER_ID = 1;
 
@@ -94,27 +99,12 @@ export default function DashboardHome() {
   const recentOrders = dashboard?.recent_orders ?? [];
 
   return (
-    <main className="flex min-h-screen flex-col gap-10">
+    <main className="flex min-h-screen flex-col px-20">
       {/* Header */}
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 pt-10 sm:flex-row items-center justify-between">
-        <div>
-          <p className="text-3xl font-semibold leading-tight text-[#0C5B0D]">
-            Farmer’s Dashboard
-          </p>
-          <p className="mt-1 text-base text-[#0C5B0D]/70">
-            Overview of recent performance and orders
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#0C5B0D] bg-white shadow-sm">
-            <UserRound className="h-5 w-5 text-[#0C5B0D]" strokeWidth={2.5} />
-          </div>
-          <p className="text-base font-medium text-gray-700">Welcome, {farmerName.split(" ")[0]}</p>
-        </div>
-      </div>
+      <DashboardHeader title={"Farmer’s Dashboard"} subtitle={"Overview of recent performance and orders"} />
 
       {/* Quick Summary Section */}
-      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-6 shadow-sm">
+      <section className="w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-6 shadow-sm mb-5">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Quick Summary
@@ -146,13 +136,13 @@ export default function DashboardHome() {
       </section>
 
       {/* Orders Overview Section */}
-      <section className="mx-auto w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 py-8 shadow-sm sm:px-6">
+      <section className="w-full max-w-5xl rounded-[20px] bg-[#F5F5F5] px-4 pb-4 pt-8 shadow-sm">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold leading-tight text-[#0C5B0D]">
             Orders Overview
           </h2>
           <Link
-            href="/orders"
+            href="/farmer/dashboard/orders"
             className="rounded-lg bg-[#0C5B0D] px-5 py-2 text-sm font-medium text-white shadow transition-all hover:bg-[#084F09] sm:text-base"
           >
             View More
