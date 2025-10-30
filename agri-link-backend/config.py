@@ -45,7 +45,9 @@ else:
     else:
         db_path = resolved
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    # Ensure absolute path to avoid cwd-related sqlite open errors
+    abs_db_path = os.path.abspath(db_path)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{abs_db_path}'
 
  
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

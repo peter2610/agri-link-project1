@@ -26,40 +26,7 @@ from routes.ai_chat_route import AiChat
 from routes.signin_farmer_route import CheckSessionFarmer
 
 
-
-# ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
-database_url = os.getenv("DATABASE_URL")
-
-if database_url:
-    # 🟢 Render PostgreSQL
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    print("⚙️ Using Render PostgreSQL database")
-else:
-    # 🟡 Local development (SQLite)
-    db_path = os.getenv('DB_PATH', 'instance/app.db')
-
-    def _ensure_path(p):
-        d = os.path.dirname(p) or '.'
-        os.makedirs(d, exist_ok=True)
-        try:
-            with open(p, 'a'):
-                pass
-            return p
-        except Exception:
-            return None
-
-    resolved = _ensure_path(db_path)
-    if not resolved:
-        fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
-        resolved = _ensure_path(fallback)
-        db_path = resolved or db_path
-    else:
-        db_path = resolved
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-    print("⚙️ Using local SQLite database (no DATABASE_URL found)")
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# DB configuration is handled in config.py
 # ✅ Enable CORS for frontend connection (env-driven)
 # Set ALLOWED_ORIGINS as a comma-separated list in your environment, e.g.:
 #   ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.yourdomain.com
