@@ -72,9 +72,22 @@ export default function CollaborationDetails() {
 
         <div className="bg-[#F4F7F4] rounded-3xl p-6 md:p-8">
           <div className="flex items-center gap-3 px-2 md:px-4">
-            <span className="text-green-800 font-semibold">Active</span>
-            <span className="text-gray-400">|</span>
-            <span className="text-green-800">Add Collaboration</span>
+            {(() => {
+              const crops = Array.isArray(order?.crops) ? order.crops : [];
+              const totalDemand = crops.reduce((s, x) => s + Number(x?.weight_demand ?? 0), 0);
+              const totalContrib = crops.reduce((s, x) => s + Number(x?.contributed_weight ?? 0), 0);
+              const progress = totalDemand > 0 ? Math.min(100, Math.round((totalContrib / totalDemand) * 100)) : 0;
+              const inactive = progress >= 100;
+              return (
+                <>
+                  <span className={`font-semibold ${inactive ? "text-gray-600" : "text-green-800"}`}>
+                    {inactive ? "Inactive" : "Active"}
+                  </span>
+                  <span className="text-gray-400">|</span>
+                  <span className="text-green-800">Progress: {progress}%</span>
+                </>
+              );
+            })()}
           </div>
 
           <div className="bg-[#F4F7F4] rounded-2xl p-6 mt-4">
@@ -129,9 +142,25 @@ export default function CollaborationDetails() {
             )}
 
           </div>
-          <div className="mt-4 -mx-6 md:-mx-8 bg-[#F4F7F4] rounded-2xl p-0">
-            <ContributionForm orderId={id} crops={order.crops ?? []} onSubmit={handleSubmit} />
-          </div>
+          {(() => {
+            const crops = Array.isArray(order?.crops) ? order.crops : [];
+            const totalDemand = crops.reduce((s, x) => s + Number(x?.weight_demand ?? 0), 0);
+            const totalContrib = crops.reduce((s, x) => s + Number(x?.contributed_weight ?? 0), 0);
+            const progress = totalDemand > 0 ? Math.min(100, Math.round((totalContrib / totalDemand) * 100)) : 0;
+            const inactive = progress >= 100;
+            if (inactive) {
+              return (
+                <div className="mt-4 -mx-6 md:-mx-8 bg-[#F4F7F4] rounded-2xl p-6 text-green-900">
+                  This collaboration is inactive because it has reached 100% contribution.
+                </div>
+              );
+            }
+            return (
+              <div className="mt-4 -mx-6 md:-mx-8 bg-[#F4F7F4] rounded-2xl p-0">
+                <ContributionForm orderId={id} crops={order.crops ?? []} onSubmit={handleSubmit} />
+              </div>
+            );
+          })()}
         </div>
       </main>
     </div>
