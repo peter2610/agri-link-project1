@@ -43,6 +43,7 @@ export default function OrdersPage() {
   const router = useRouter();
   const [status, setStatus] = useState(ACTIVE);
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState("User");
@@ -67,12 +68,13 @@ export default function OrdersPage() {
         // Fetch offers for the current/fallback farmer
         const fid = process.env.NEXT_PUBLIC_FALLBACK_FARMER_ID;
         const qs = fid ? `?farmer_id=${encodeURIComponent(fid)}` : "";
-        const data = await fetchJson(`/offer${qs}`);
+        const data = await fetchJson(`/offers${qs}`);
 
         if (!ignore) {
           // Accept both array payloads and objects with orders property
           const list = Array.isArray(data) ? data : (data?.orders ?? []);
           setOrders(list && list.length > 0 ? list : mockOrders);
+          setPage(1);
         }
       } catch (fetchError) {
         if (!ignore) {
@@ -159,6 +161,11 @@ export default function OrdersPage() {
 
 
 
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(orders.length / pageSize));
+  const start = (page - 1) * pageSize;
+  const visible = orders.slice(start, start + pageSize);
+
   return (
     <div className="flex-1 min-h-screen bg-[#FAFAFA] px-20 text-[#0C5B0D]">
       <main className="flex flex-col">
@@ -222,8 +229,8 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                {!loading && !error && orders.map((order, index) => {
-                  const buttonColor = collaborateColors[index % collaborateColors.length];
+                {!loading && !error && visible.map((order, index) => {
+                  const buttonColor = collaborateColors[(start + index) % collaborateColors.length];
                   const priceDisplay = formatNumber(order.price_per_kg ?? order.price, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -231,11 +238,11 @@ export default function OrdersPage() {
 
                   return (
                     <div
-                      key={`${status}-${order.id ?? index}`}
-                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === orders.length - 1 ? "" : "border-b border-[#E4E4E4]"
+                      key={`${status}-${order.id ?? (start + index)}`}
+                      className={`grid grid-cols-[50px_repeat(4,minmax(0,1fr))_minmax(0,140px)] gap-3 px-5 py-4 text-sm text-gray-700 sm:text-base ${index === visible.length - 1 ? "" : "border-b border-[#E4E4E4]"
                         }`}
                     >
-                      <span className="font-medium text-[#0C5B0D]">{order.id ?? index + 1}</span>
+                      <span className="font-medium text-[#0C5B0D]">{start + index + 1}</span>
                       <span>{order.crop_name ?? order.crop ?? "—"}</span>
                       <span>{formatNumber(order.quantity)}</span>
                       <span>{priceDisplay}</span>
@@ -252,6 +259,33 @@ export default function OrdersPage() {
                     </div>
                   );
                 })}
+              </div>
+              <div className="mt-4 flex items-center justify-between px-5 py-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className={`rounded-xl px-4 py-2 border border-green-800 text-green-800 ${page <= 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  Prev
+                </button>
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`min-w-9 rounded-lg px-3 py-1 text-sm ${p === page ? "bg-green-800 text-white" : "border border-green-800 text-green-800"}`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className={`rounded-xl px-4 py-2 bg-green-800 text-white ${page >= totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>

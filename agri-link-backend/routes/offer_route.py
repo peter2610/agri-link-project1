@@ -42,21 +42,25 @@ class OfferResource(Resource):
             or request.headers.get('X-Farmer-Id')
             or session.get('farmer_id')
         )
-        if not farmer_id:
-            return [], 200
+        # Build base SQL selecting joined offer/crop data
+        base_sql = [
+            "SELECT o.id, o.quantity, o.price, o.location, o.post_harvest_period, o.status,",
+            "       COALESCE(c.name, 'Unknown') AS crop_name,",
+            "       COALESCE(CAST(c.category AS TEXT), 'Unknown') AS category",
+            "FROM offers o",
+            "LEFT JOIN crops c ON c.id = o.crop_id",
+        ]
+
+        params = {}
+        if farmer_id:
+            base_sql.append("WHERE o.farmer_id = :fid")
+            params["fid"] = int(farmer_id)
+
+        base_sql.append("ORDER BY o.id DESC")
+        sql = "\n".join(base_sql)
 
         # Use raw SQL with CAST to TEXT for portability across SQLite/Postgres
-        rows = db.session.execute(text(
-            """
-            SELECT o.id, o.quantity, o.price, o.location, o.post_harvest_period, o.status,
-                   COALESCE(c.name, 'Unknown') AS crop_name,
-                   COALESCE(CAST(c.category AS TEXT), 'Unknown') AS category
-            FROM offers o
-            LEFT JOIN crops c ON c.id = o.crop_id
-            WHERE o.farmer_id = :fid
-            ORDER BY o.id DESC
-            """
-        ), {"fid": int(farmer_id)}).mappings().all()
+        rows = db.session.execute(text(sql), params).mappings().all()
 
         result = [
             {
@@ -78,7 +82,17 @@ class OfferResource(Resource):
     # ======================================
     def post(self):
         try:
-            data = offer_parser.parse_args()
+            # Parse JSON safely without raising BadRequest on invalid JSON
+            body = request.get_json(silent=True) or {}
+            # Also allow form submissions
+            if not body and request.form:
+                body = request.form.to_dict()
+            # Merge with any query params for flexibility
+            merged = {
+                **({k: v for k, v in request.args.items()}),
+                **body,
+            }
+            data = merged
             # Resolve farmer_id from multiple sources (session, body, header, query)
             farmer_id = (
                 session.get('farmer_id')

@@ -18,6 +18,7 @@ import DashboardHeader from "@/components/dashboard/header/dashboard-header";
 
 export default function CollaborationHub() {
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
   const [userName, setUserName] = useState("User");
   const router = useRouter();
   const toPrice = (val) => {
@@ -27,7 +28,6 @@ export default function CollaborationHub() {
       const n = Number(val);
       return Number.isFinite(n) ? n : val;
     }
-    // Handle object shapes like { amount }
     if (typeof val === "object") {
       if (typeof val.amount === "number") return val.amount;
       if (typeof val.value === "number") return val.value;
@@ -42,7 +42,6 @@ export default function CollaborationHub() {
         const res = await fetch(`/api/collaborations`, { method: "GET" });
         if (!res.ok) throw new Error(`Failed to load collaborations (${res.status})`);
         const data = await res.json();
-        // Map backend collaborations to UI rows
         const mapped = (Array.isArray(data) ? data : []).map((c) => {
           const first = (c.crops && c.crops[0]) || null;
           const weightDemand = first?.weight_demand ?? 0;
@@ -58,6 +57,7 @@ export default function CollaborationHub() {
           };
         });
         setOrders(mapped);
+        setPage(1);
       } catch (err) {
         console.error("Error fetching collaborations:", err);
         toast.error(err?.message || "Failed to load collaborations");
@@ -65,7 +65,6 @@ export default function CollaborationHub() {
     }
     fetchOrders();
 
-    // load logged-in name
     try {
       const raw = window.localStorage.getItem("agri_user");
       if (raw) {
@@ -78,6 +77,11 @@ export default function CollaborationHub() {
   const handleJoinCollaboration = (orderId) => {
     router.push(`/farmer/dashboard/collaborations/${orderId}`);
   };
+
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(orders.length / pageSize));
+  const start = (page - 1) * pageSize;
+  const visible = orders.slice(start, start + pageSize);
 
   return (
     <div className="flex min-h-screen bg-[#ffffff]">
@@ -112,7 +116,7 @@ export default function CollaborationHub() {
                     </td>
                   </tr>
                 ) : (
-                  orders.map((order, index) => (
+                  visible.map((order, index) => (
                     <CollaborationCard
                       key={order.id}
                       order={order}
@@ -124,9 +128,36 @@ export default function CollaborationHub() {
               </tbody>
             </table>
           </div>
+
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className={`rounded-xl px-4 py-2 border border-green-800 text-green-800 ${page <= 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              Prev
+            </button>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`min-w-9 rounded-lg px-3 py-1 text-sm ${p === page ? "bg-green-800 text-white" : "border border-green-800 text-green-800"}`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className={`rounded-xl px-4 py-2 bg-green-800 text-white ${page >= totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </main>
     </div>
   );
 }
-
