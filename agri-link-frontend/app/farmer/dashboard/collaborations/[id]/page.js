@@ -14,11 +14,8 @@ import {
   ArrowLeft,
   UserRound,
 } from "lucide-react";
-<<<<<<< HEAD:agri-link-frontend/app/collaboration/[id]/page.js
 import { toast } from "react-hot-toast";
-=======
 import DashboardHeader from "@/components/dashboard/header/dashboard-header";
->>>>>>> 262cf45 (Added AI chat):agri-link-frontend/app/farmer/dashboard/collaborations/[id]/page.js
 
 export default function CollaborationDetails() {
   const { id } = useParams();

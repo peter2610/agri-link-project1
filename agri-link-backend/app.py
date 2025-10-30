@@ -22,101 +22,109 @@ from routes.dashboard_route import DashboardResource, FarmerStatsResource
 from routes.order_route import OrderListResource, OrderDetailResource, OrderStatisticsResource
 from routes.mailing_list_route import AddToMailingList, GetMailingList
 from routes.ai_chat_route import AiChat
-<<<<<<< Updated upstream
 from routes.signin_farmer_route import CheckSessionFarmer
-=======
->>>>>>> Stashed changes
 
 
-# ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
-database_url = os.getenv("DATABASE_URL")
+# # ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
+# database_url = os.getenv("DATABASE_URL")
 
-if database_url:
-    # 🟢 Render PostgreSQL
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    print("⚙️ Using Render PostgreSQL database")
-else:
-    # 🟡 Local development (SQLite)
-    db_path = os.getenv('DB_PATH', 'instance/app.db')
+# if database_url:
+#     # 🟢 Render PostgreSQL
+#     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+#     print("⚙️ Using Render PostgreSQL database")
+# else:
+#     # 🟡 Local development (SQLite)
+#     db_path = os.getenv('DB_PATH', 'instance/app.db')
 
-    def _ensure_path(p):
-        d = os.path.dirname(p) or '.'
-        os.makedirs(d, exist_ok=True)
-        try:
-            with open(p, 'a'):
-                pass
-            return p
-        except Exception:
-            return None
+#     def _ensure_path(p):
+#         d = os.path.dirname(p) or '.'
+#         os.makedirs(d, exist_ok=True)
+#         try:
+#             with open(p, 'a'):
+#                 pass
+#             return p
+#         except Exception:
+#             return None
 
-    resolved = _ensure_path(db_path)
-    if not resolved:
-        fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
-        resolved = _ensure_path(fallback)
-        db_path = resolved or db_path
-    else:
-        db_path = resolved
+#     resolved = _ensure_path(db_path)
+#     if not resolved:
+#         fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
+#         resolved = _ensure_path(fallback)
+#         db_path = resolved or db_path
+#     else:
+#         db_path = resolved
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-    print("⚙️ Using local SQLite database (no DATABASE_URL found)")
+#     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+#     print("⚙️ Using local SQLite database (no DATABASE_URL found)")
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# ✅ Enable CORS for frontend connection (env-driven)
-# Set ALLOWED_ORIGINS as a comma-separated list in your environment, e.g.:
-#   ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.yourdomain.com
-default_origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://172.16.16.182:3000",
-]
-env_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
-allowed_origins = [o.strip() for o in env_origins.split(",") if o.strip()] or default_origins
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# # ✅ Enable CORS for frontend connection (env-driven)
+# # Set ALLOWED_ORIGINS as a comma-separated list in your environment, e.g.:
+# #   ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.yourdomain.com
+# default_origins = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+#     "http://172.16.16.182:3000",
+# ]
+# env_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
+# allowed_origins = [o.strip() for o in env_origins.split(",") if o.strip()] or default_origins
 
-CORS(
-    app,
-    resources={r"/*": {"origins": allowed_origins}},
-    supports_credentials=True,
-)
+# CORS(
+#     app,
+#     resources={r"/*": {"origins": allowed_origins}},
+#     supports_credentials=True,
+# )
 
-# ----- Global JSON error handlers -----
-from flask import jsonify
+# # ----- Global JSON error handlers -----
+# from flask import jsonify
 
-def _json_error(message, status, details=None):
-    payload = {"error": message}
-    if details:
-        payload["details"] = str(details)
-    response = jsonify(payload)
-    response.status_code = status
-    return response
+# def _json_error(message, status, details=None):
+#     payload = {"error": message}
+#     if details:
+#         payload["details"] = str(details)
+#     response = jsonify(payload)
+#     response.status_code = status
+#     return response
 
-@app.errorhandler(400)
-def handle_400(e):
-    return _json_error("Bad Request", 400, getattr(e, "description", None))
+# @app.errorhandler(400)
+# def handle_400(e):
+#     return _json_error("Bad Request", 400, getattr(e, "description", None))
 
-@app.errorhandler(401)
-def handle_401(e):
-    return _json_error("Unauthorized", 401, getattr(e, "description", None))
+# @app.errorhandler(401)
+# def handle_401(e):
+#     return _json_error("Unauthorized", 401, getattr(e, "description", None))
 
-@app.errorhandler(403)
-def handle_403(e):
-    return _json_error("Forbidden", 403, getattr(e, "description", None))
+# @app.errorhandler(403)
+# def handle_403(e):
+#     return _json_error("Forbidden", 403, getattr(e, "description", None))
 
-@app.errorhandler(404)
-def handle_404(e):
-    return _json_error("Not Found", 404, getattr(e, "description", None))
+# @app.errorhandler(404)
+# def handle_404(e):
+#     return _json_error("Not Found", 404, getattr(e, "description", None))
 
-@app.errorhandler(422)
-def handle_422(e):
-    return _json_error("Unprocessable Entity", 422, getattr(e, "description", None))
+# @app.errorhandler(422)
+# def handle_422(e):
+#     return _json_error("Unprocessable Entity", 422, getattr(e, "description", None))
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # Surface details to help diagnose production errors quickly
-    return _json_error("Internal Server Error", 500, e)
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     # Surface details to help diagnose production errors quickly
+#     return _json_error("Internal Server Error", 500, e)
+
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://172.16.16.182:3000"
+        ]
+    }
+}, supports_credentials=True)
 
 # ✅ Ensure tables exist (runs once on startup)
 with app.app_context():
     db.create_all()
+
 
 # ✅ Register Routes
 api.add_resource(Main, '/', endpoint='main')
@@ -145,11 +153,8 @@ api.add_resource(OrderStatisticsResource, '/orders/statistics')
 api.add_resource(AddToMailingList, '/join_mailinglist')
 api.add_resource(GetMailingList, '/mailinglist')
 api.add_resource(AiChat, "/ai/chat")
-<<<<<<< Updated upstream
 api.add_resource(CheckSessionFarmer, "/farmer/check_session")
 # api.add_resource(CheckSessionBuyer, "/buyer/check_session")
-=======
->>>>>>> Stashed changes
 
 # ✅ Run Server
 if __name__ == '__main__':
