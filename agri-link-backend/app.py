@@ -23,6 +23,39 @@ from routes.order_route import OrderListResource, OrderDetailResource, OrderStat
 from routes.mailing_list_route import AddToMailingList, GetMailingList
 
 
+# ✅ Detect DATABASE_URL from Render (PostgreSQL) or fallback to SQLite locally
+database_url = os.getenv("DATABASE_URL")
+
+if database_url:
+    # 🟢 Render PostgreSQL
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    print("⚙️ Using Render PostgreSQL database")
+else:
+    # 🟡 Local development (SQLite)
+    db_path = os.getenv('DB_PATH', 'instance/app.db')
+
+    def _ensure_path(p):
+        d = os.path.dirname(p) or '.'
+        os.makedirs(d, exist_ok=True)
+        try:
+            with open(p, 'a'):
+                pass
+            return p
+        except Exception:
+            return None
+
+    resolved = _ensure_path(db_path)
+    if not resolved:
+        fallback = os.getenv('FALLBACK_DB_PATH', '/tmp/app.db')
+        resolved = _ensure_path(fallback)
+        db_path = resolved or db_path
+    else:
+        db_path = resolved
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    print("⚙️ Using local SQLite database (no DATABASE_URL found)")
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # ✅ Enable CORS for frontend connection (env-driven)
 # Set ALLOWED_ORIGINS as a comma-separated list in your environment, e.g.:
 #   ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.yourdomain.com
@@ -73,4 +106,6 @@ api.add_resource(GetMailingList, '/mailinglist')
 
 # ✅ Run Server
 if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5555))
+    debug = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     app.run(port=5555, debug=True)
