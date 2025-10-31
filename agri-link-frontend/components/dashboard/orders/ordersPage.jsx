@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { fetchJson } from "@/lib/api";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import DashboardHeader from "../header/dashboard-header";
 
@@ -55,8 +55,6 @@ export default function OrdersPage() {
     { id: 103, crop_name: "Avocado", quantity: 200, price: 150, location: "Murang'a" },
   ];
 
-  const searchParams = useSearchParams();
-
   useEffect(() => {
     let ignore = false;
 
@@ -98,15 +96,15 @@ export default function OrdersPage() {
 
   // Show success message after redirect with created=1
   useEffect(() => {
-    const created = searchParams?.get("created");
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const created = url.searchParams.get("created");
     if (created === "1") {
       toast.success("Offer created successfully");
-      // Remove the param from URL without reload
-      const url = new URL(window.location.href);
       url.searchParams.delete("created");
       window.history.replaceState({}, "", url.toString());
     }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     try {
