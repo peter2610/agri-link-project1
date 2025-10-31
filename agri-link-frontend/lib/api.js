@@ -1,7 +1,7 @@
 const DEFAULT_BASE_URL =
   (process.env.NEXT_PUBLIC_API && process.env.NEXT_PUBLIC_API.trim()) ||
   (process.env.NEXT_PUBLIC_API_BASE_URL && process.env.NEXT_PUBLIC_API_BASE_URL.trim()) ||
-  "http://localhost:5555";
+  "https://agri-link-project1.onrender.com";
 
 const buildUrl = (pathOrUrl) => {
   if (!pathOrUrl) {
