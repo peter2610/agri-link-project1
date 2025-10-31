@@ -150,7 +150,7 @@ export default function OrdersPage() {
         return toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
       }
       toast.success("Collaboration created");
-      router.push("/collaboration");
+      router.push("/farmer/dashboard/collaborations");
     } catch (e) {
       const msg = e?.message || "Failed to create collaboration";
       toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
